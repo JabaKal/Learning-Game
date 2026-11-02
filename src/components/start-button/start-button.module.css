@@ -1,0 +1,23 @@
+/* „დაიწყე“ — დიდი ოქროს ღილაკი სცენაზე. ადგილს ითვლის scene კომპონენტი (state 'startButton'):
+   ტელეფონზე — ბილიკზე, კომპიუტერზე — მარჯვნივ, ბოროტების მიწაზე. ფეთქავს და ოდნავ ტივტივებს */
+.start-btn {
+  position: fixed; z-index: 5; left: 50%; top: 80%; transform: translate(-50%, -50%);
+  min-height: 60px; padding: 0 34px 0 30px; gap: 11px; border-radius: 999px; border-width: 2px;
+  font-size: 19px; letter-spacing: .02em;
+  animation: start-beacon 2s ease-out infinite, start-bob 3.2s ease-in-out infinite;
+}
+.start-btn .btn__icon { width: 24px; height: 24px; }
+.start-btn__arrow { width: 18px; height: 18px; margin-left: 2px; transition: transform .2s; }
+
+.start-btn:active { transform: translate(-50%, calc(-50% + 2px)); }
+@media (hover: hover) {
+  .start-btn:hover { transform: translate(-50%, calc(-50% - 2px)); }   /* ცენტრი არ ირღვევა */
+  .start-btn:hover .start-btn__arrow { transform: translateX(4px); }
+}
+
+@keyframes start-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -5px; } }
+@keyframes start-beacon {
+  0% { box-shadow: inset 0 2px 0 rgba(255, 255, 255, .8), inset 0 -3px 0 rgba(130, 65, 10, .35), 0 0 0 0 rgba(255, 220, 130, .85), 0 0 34px rgba(255, 190, 80, .7), 0 12px 30px rgba(0, 0, 0, .45); }
+  70% { box-shadow: inset 0 2px 0 rgba(255, 255, 255, .8), inset 0 -3px 0 rgba(130, 65, 10, .35), 0 0 0 22px rgba(255, 220, 130, 0), 0 0 46px rgba(255, 190, 80, .85), 0 12px 30px rgba(0, 0, 0, .45); }
+  100% { box-shadow: inset 0 2px 0 rgba(255, 255, 255, .8), inset 0 -3px 0 rgba(130, 65, 10, .35), 0 0 0 22px rgba(255, 220, 130, 0), 0 0 34px rgba(255, 190, 80, .7), 0 12px 30px rgba(0, 0, 0, .45); }
+}

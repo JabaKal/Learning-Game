@@ -1,0 +1,72 @@
+/* ენის ღილაკი და ჩამოსაშლელი სია */
+.lang { position: relative; }
+.lang__btn {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 42px; padding: 0 12px; border-radius: 12px; cursor: pointer;
+  font: 700 14px var(--font-sans); color: var(--ink);
+  border: 1.5px solid rgba(255, 255, 255, .35); background: rgba(255, 255, 255, .06);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  transition: background .2s, border-color .2s, color .2s, transform .18s, box-shadow .2s;
+}
+.lang__btn svg { width: 18px; height: 18px; flex: none; }
+.lang__chev { width: 12px !important; height: 12px !important; transition: transform .2s; }
+.lang__chev--up { transform: rotate(180deg); }
+@media (hover: hover) {
+  .lang__btn:hover {
+    background: rgba(242, 181, 74, .16); border-color: var(--gold); color: #ffe2a8;
+    transform: translateY(-2px); box-shadow: 0 0 0 3px rgba(242, 181, 74, .14), 0 8px 20px rgba(0, 0, 0, .35);
+  }
+}
+
+/* დახურული სია ზუსტად ღილაკის ზომისაა (--bw, --bh — JS ანახლებს) და გახსნისას იქიდან იზრდება */
+.lang__menu {
+  --bw: 96px; --bh: 42px;
+  position: absolute; z-index: 3; top: 0; right: 0; width: 236px; padding-bottom: 6px; border-radius: 14px;
+  background: linear-gradient(180deg, rgba(30, 36, 62, .97), rgba(18, 21, 40, .97));
+  border: 1px solid rgba(255, 255, 255, .14); box-shadow: 0 18px 40px rgba(0, 0, 0, .5);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  clip-path: inset(0 0 calc(100% - var(--bh)) calc(100% - var(--bw)) round var(--br, 12px));
+  opacity: 0; visibility: hidden;
+  transition: clip-path .26s cubic-bezier(.4, 0, .2, 1), opacity .14s .12s, visibility 0s .26s;
+}
+.lang__menu--open {
+  clip-path: inset(0 0 0 0 round 14px); opacity: 1; visibility: visible;
+  transition: clip-path .3s cubic-bezier(.2, .9, .25, 1), opacity .08s, visibility 0s;
+}
+.lang__head {
+  width: 100%; height: var(--bh); display: flex; align-items: center; justify-content: space-between; padding: 0 13px 0 16px;
+  border: 0; border-bottom: 1px solid rgba(255, 255, 255, .1); background: none; color: var(--ink); cursor: pointer;
+  font: 700 14px var(--font-sans);
+}
+.lang__title { color: var(--muted); font-weight: 600; }
+.lang__now { display: inline-flex; align-items: center; gap: 7px; }
+.lang__now svg { width: 18px; height: 18px; }
+.lang__list { padding: 6px 6px 0; }
+.lang__item {
+  width: 100%; display: grid; grid-template-columns: 40px 1fr 16px; align-items: center; gap: 6px;
+  padding: 10px; border: 0; border-radius: 10px; background: none; cursor: pointer; text-align: left;
+  color: var(--ink); font: 600 15px var(--font-latin);
+  opacity: 0; transform: translateY(-6px); transition: opacity .16s, transform .16s, background .15s;
+}
+.lang__menu--open .lang__item {   /* ენები ჩნდება ერთმანეთის მიყოლებით */
+  opacity: 1; transform: none;
+  transition: opacity .2s calc(40ms + var(--i) * 14ms), transform .2s calc(40ms + var(--i) * 14ms), background .15s;
+}
+.lang__item small { color: var(--muted); font-size: 11.5px; font-weight: 700; letter-spacing: .04em; }
+.lang__check { width: 16px; height: 16px; color: var(--gold-text); opacity: 0; }
+.lang__item:hover { background: rgba(255, 255, 255, .07); }
+.lang__item--on { background: rgba(255, 255, 255, .09); }
+.lang__item--on .lang__check { opacity: 1; }
+
+/* ტელეფონი: მრგვალებული, შესვლის ღილაკის სიმაღლის */
+.lang__btn, .lang__item, .lang__head { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }   /* დაჭერა — დაყოვნების გარეშე */
+
+/* ტელეფონი: მხოლოდ გლობუსი მრგვალ ღილაკში (წარწერა და ისარი იმალება).
+   სია იგივენაირად „იზრდება“ ღილაკიდან, როგორც კომპიუტერზე: ზემოთ — „ენა 🌐 ქარ ⌃“ */
+@media (max-width: 760px) {
+  .lang__btn { width: 44px; height: 44px; min-height: 44px; padding: 0; justify-content: center; border-radius: 50%; }
+  .lang__btn svg { width: 21px; height: 21px; }
+  .lang__btn .lang__code, .lang__btn .lang__chev { display: none; }
+  .lang__menu { --br: 22px; width: 230px; }               /* დახურული სია — მრგვალი, ღილაკის ზომის */
+  .lang__item { padding: 11px 10px; }
+  .lang__item:active { background: rgba(255, 255, 255, .12); }
+}

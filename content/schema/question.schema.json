@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "question.schema.json",
+  "title": "ტესტის ფაილი (თემა და მისი კითხვები)",
+  "description": "ერთი თემის (topic) კითხვები. ტექსტები ითარგმნება სწავლების ენებზე: { \"ka\": \"...\", \"en\": \"...\" }. იხ. content/README.md",
+  "type": "object",
+  "required": ["subject", "topic", "questions"],
+  "properties": {
+    "subject": { "enum": ["english", "spanish", "german", "french", "geography"] },
+    "topic": { "type": "string", "pattern": "^[a-z0-9-]+$", "description": "თემის ID, მაგ. capitals-europe" },
+    "level": { "type": "integer", "minimum": 1, "maximum": 10, "description": "სირთულე: 1 — დამწყები" },
+    "title": { "$ref": "#/$defs/text" },
+    "questions": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/question" } }
+  },
+  "$defs": {
+    "text": {
+      "description": "ტექსტი სწავლების ენებზე; ქართული (ka) სავალდებულოა, დანარჩენი — თანდათან",
+      "type": "object",
+      "required": ["ka"],
+      "propertyNames": { "enum": ["ka", "en", "tr", "hy", "az", "ru", "kk", "uz"] },
+      "additionalProperties": { "type": "string" }
+    },
+    "question": {
+      "type": "object",
+      "required": ["id", "type", "prompt"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "type": {
+          "enum": ["single_choice", "multiple_choice", "true_false", "fill_blank", "match_pairs", "order_words", "listen_choose", "flag_pick", "map_pick", "image_choice"]
+        },
+        "prompt": { "$ref": "#/$defs/text" },
+        "explanation": { "$ref": "#/$defs/text", "description": "ახსნა — ჩანს პასუხის შემდეგ" },
+        "media": {
+          "type": "object",
+          "properties": {
+            "image": { "type": "string", "description": "გზა assets/-ში" },
+            "audio": { "type": "string", "description": "გამოთქმა (listen_choose)" },
+            "flag": { "type": "string", "pattern": "^[A-Z]{2}$", "description": "ქვეყნის კოდი ISO 3166-1" }
+          },
+          "additionalProperties": false
+        },
+        "options": {
+          "type": "array", "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["id"],
+            "properties": {
+              "id": { "type": "string" },
+              "text": { "anyOf": [{ "type": "string" }, { "$ref": "#/$defs/text" }], "description": "სტრინგი — თუ არ ითარგმნება (მაგ. ინგლისური სიტყვა)" },
+              "image": { "type": "string" },
+              "country": { "type": "string", "pattern": "^[A-Z]{2}$" }
+            }
+          }
+        },
+        "answer": {
+          "description": "სწორი პასუხი; ფორმა დამოკიდებულია type-ზე (იხ. content/README.md)",
+          "anyOf": [
+            { "type": "string" }, { "type": "boolean" },
+            { "type": "array", "items": { "type": "string" } },
+            { "type": "array", "items": { "type": "array", "items": { "type": "string" }, "minItems": 2, "maxItems": 2 } }
+          ]
+        },
+        "accept": { "type": "array", "items": { "type": "string" }, "description": "fill_blank — დასაშვები ვარიანტები" },
+        "timeLimitSec": { "type": "integer", "minimum": 3, "description": "ბრძოლაში — დრო პასუხისთვის" },
+        "points": { "type": "integer", "minimum": 1, "default": 10 }
+      },
+      "additionalProperties": false
+    }
+  }
+}

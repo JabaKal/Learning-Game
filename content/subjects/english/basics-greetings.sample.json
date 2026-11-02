@@ -1,0 +1,62 @@
+{
+  "subject": "english",
+  "topic": "basics-greetings",
+  "level": 1,
+  "title": { "ka": "მისალმება", "ru": "Приветствия" },
+  "questions": [
+    {
+      "id": "hello-translate",
+      "type": "single_choice",
+      "prompt": { "ka": "როგორ ითარგმნება „გამარჯობა“?", "ru": "Как переводится «Привет»?" },
+      "options": [
+        { "id": "a", "text": "Hello" },
+        { "id": "b", "text": "Goodbye" },
+        { "id": "c", "text": "Thank you" }
+      ],
+      "answer": "a"
+    },
+    {
+      "id": "fill-morning",
+      "type": "fill_blank",
+      "prompt": { "ka": "შეავსე: Good ___! (დილა მშვიდობისა)" },
+      "answer": "morning",
+      "accept": ["morning", "Morning"]
+    },
+    {
+      "id": "pairs-basic",
+      "type": "match_pairs",
+      "prompt": { "ka": "დააწყვილე სიტყვები" },
+      "answer": [["cat", "კატა"], ["dog", "ძაღლი"], ["house", "სახლი"]]
+    },
+    {
+      "id": "order-sentence",
+      "type": "order_words",
+      "prompt": { "ka": "ააწყვე წინადადება: „მე მიყვარს წიგნები“" },
+      "answer": ["I", "love", "books"]
+    },
+    {
+      "id": "listen-thanks",
+      "type": "listen_choose",
+      "prompt": { "ka": "მოუსმინე და აირჩიე" },
+      "media": { "audio": "assets/audio/en/thank-you.mp3" },
+      "options": [
+        { "id": "a", "text": "Thank you" },
+        { "id": "b", "text": "Excuse me" },
+        { "id": "c", "text": "See you" }
+      ],
+      "answer": "a"
+    },
+    {
+      "id": "greetings-multi",
+      "type": "multiple_choice",
+      "prompt": { "ka": "მონიშნე ყველა მისალმება" },
+      "options": [
+        { "id": "a", "text": "Hi" },
+        { "id": "b", "text": "Hello" },
+        { "id": "c", "text": "Apple" },
+        { "id": "d", "text": "Good evening" }
+      ],
+      "answer": ["a", "b", "d"]
+    }
+  ]
+}

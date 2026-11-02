@@ -1,0 +1,22 @@
+/* ზედა ზოლი: ლოგო მარცხნივ, ენა + შესვლა მარჯვნივ. ყოველთვის გამჭვირვალე */
+.site-header {
+  position: fixed; z-index: 10; top: 0; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 12px var(--header-pad);
+}
+.site-header__logo { display: flex; color: var(--ink); }
+.site-header__logo svg { width: 34px; height: 34px; transition: transform .25s; }
+.site-header__actions { display: flex; align-items: center; gap: 10px; }
+.site-header__login-icon { display: none; width: 22px; height: 22px; flex: none; }   /* კომპიუტერზე — მხოლოდ წარწერა */
+
+@media (hover: hover) {
+  .site-header__logo:hover svg { transform: rotate(-8deg) scale(1.08); }
+}
+
+/* ტელეფონი: შესვლა — მხოლოდ მომხმარებლის ხატულა, მრგვალ ღილაკში */
+@media (max-width: 760px) {
+  .site-header__actions { gap: 8px; }
+  .site-header__login { width: 44px; height: 44px; min-height: 44px; padding: 0; border-radius: 50%; }
+  .site-header__login-text { display: none; }
+  .site-header__login-icon { display: block; }
+}

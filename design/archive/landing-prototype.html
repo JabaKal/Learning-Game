@@ -1,0 +1,1193 @@
+<!doctype html>
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>მთავარი გვერდი</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;600;800&family=Noto+Serif+Georgian:wght@800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #f2b54a; --ink: #f6efe4; --muted: #d8cbb6;
+    --panel: rgba(16, 11, 30, .76); --line: rgba(255, 255, 255, .12);
+  }
+  /* სქროლვისას გვერდი თავისით „ჩაჯდება“ ან მთავარ ეკრანზე, ან ქვედა კონტეინერზე */
+  html, body { height: 100%; overflow: hidden; }   /* ერთი ეკრანი — სქროლი არ არის */
+  body { background: #0b0816; color: var(--ink); font-family: 'Noto Sans Georgian', system-ui, sans-serif; }
+
+  /* ---------- ზედა ზოლი ---------- */
+  .top {
+    position: fixed; z-index: 10; top: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 12px clamp(16px, 5vw, 56px);   /* ყოველთვის გამჭვირვალე */
+  }
+  .logo { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-weight: 800; }
+  .logo svg { width: 34px; height: 34px; }
+  .links { display: flex; gap: 26px; }
+  .links a {
+    position: relative; color: var(--muted); text-decoration: none; font-weight: 600; font-size: 15px; transition: color .2s;
+  }
+  .links a::after {                                       /* hover — ოქროს ხაზი შუიდან იშლება */
+    content: ''; position: absolute; left: 50%; right: 50%; bottom: -6px; height: 2px; border-radius: 2px;
+    background: linear-gradient(90deg, #ffe29a, #f2a33a); transition: left .25s, right .25s;
+  }
+
+  /* ---------- ღილაკები ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 26px;
+    border-radius: 14px; font: 800 16px 'Noto Sans Georgian', sans-serif; text-decoration: none;
+    transition: transform .18s, box-shadow .2s, filter .2s, background .2s, border-color .2s, color .2s;
+  }
+  .btn.small { min-height: 42px; padding: 0 18px; font-size: 14px; border-radius: 12px; }
+  .login-ico { display: none; width: 22px; height: 22px; flex: none; }   /* კომპიუტერზე — მხოლოდ წარწერა */
+  /* „დაიწყე“ — ოქროს ფირფიტა: ბრინჯაოს კანტი, ზედა ბზინვარება, ხმლების ხატულა, დროდადრო გადამრბენი სინათლე */
+  .primary {
+    --glow: 0 0 0 4px rgba(255, 214, 120, .18), 0 10px 26px rgba(240, 165, 49, .45);
+    position: relative; overflow: hidden; isolation: isolate; gap: 9px;
+    color: #3a1d05; letter-spacing: .01em; text-shadow: 0 1px 0 rgba(255, 244, 210, .7);
+    background: linear-gradient(180deg, #fff0b8 0%, #f8c95a 36%, #eaa233 68%, #c97a1a 100%);
+    border: 1.5px solid #8a4f12;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, .75), inset 0 -3px 0 rgba(130, 65, 10, .35), var(--glow);
+  }
+  .primary::after {
+    content: ''; position: absolute; z-index: -1; top: -20%; bottom: -20%; left: -60%; width: 38%;
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .7), transparent); transform: skewX(-20deg);
+    animation: shine 3.6s ease-in-out infinite;
+  }
+  .primary .ico { width: 21px; height: 21px; flex: none; }
+  .primary:active { transform: translateY(2px); }
+  @keyframes shine { 0%, 62% { left: -60%; } 100% { left: 130%; } }
+  /* გზაზე მდგომი ღილაკის მფეთქავი ნათება */
+  @keyframes beacon {
+    0% { box-shadow: inset 0 2px 0 rgba(255, 255, 255, .8), inset 0 -3px 0 rgba(130, 65, 10, .35), 0 0 0 0 rgba(255, 220, 130, .85), 0 0 34px rgba(255, 190, 80, .7), 0 12px 30px rgba(0, 0, 0, .45); }
+    70% { box-shadow: inset 0 2px 0 rgba(255, 255, 255, .8), inset 0 -3px 0 rgba(130, 65, 10, .35), 0 0 0 22px rgba(255, 220, 130, 0), 0 0 46px rgba(255, 190, 80, .85), 0 12px 30px rgba(0, 0, 0, .45); }
+    100% { box-shadow: inset 0 2px 0 rgba(255, 255, 255, .8), inset 0 -3px 0 rgba(130, 65, 10, .35), 0 0 0 22px rgba(255, 220, 130, 0), 0 0 34px rgba(255, 190, 80, .7), 0 12px 30px rgba(0, 0, 0, .45); }
+  }
+  .ghost { color: var(--ink); border: 1.5px solid rgba(255, 255, 255, .35); background: rgba(255, 255, 255, .06); backdrop-filter: blur(6px); }
+
+  /* ---------- ზედა ზოლის მარჯვენა ღილაკები: ენა + შესვლა ---------- */
+  .actions { display: flex; align-items: center; gap: 10px; }
+  .lang-btn { transition: background .2s, border-color .2s, color .2s, transform .18s, box-shadow .2s; }
+  .ghost:active, .lang-btn:active { transform: translateY(0); }
+
+  /* ---------- hover — ერთიანი, სადა სტილი ყველა ღილაკისთვის (მხოლოდ მაუსიან მოწყობილობებზე) ---------- */
+  @media (hover: hover) {
+    /* გამჭვირვალე ღილაკები (გაიგე მეტი, შესვლა, ენა): ოქროს კანტი, ოქროსფერი ტექსტი, მსუბუქი აწევა */
+    .ghost:hover, .hero .ghost:hover, .lang-btn:hover {
+      background: rgba(242, 181, 74, .16); border-color: #f2b54a; color: #ffe2a8;
+      transform: translateY(-2px); box-shadow: 0 0 0 3px rgba(242, 181, 74, .14), 0 8px 20px rgba(0, 0, 0, .35);
+    }
+    /* „დაიწყე“: უფრო კაშკაშა ოქრო, აწევა და ძლიერი ნათება */
+    .primary:hover {
+      filter: brightness(1.07) saturate(1.05); transform: translateY(-2px);
+      box-shadow: inset 0 2px 0 rgba(255, 255, 255, .75), inset 0 -3px 0 rgba(130, 65, 10, .35),
+                  0 0 0 5px rgba(255, 214, 120, .24), 0 14px 32px rgba(240, 165, 49, .6);
+    }
+    .primary:hover .ico { transform: rotate(-8deg) scale(1.08); }
+    .links a:hover { color: var(--ink); }
+    .links a:hover::after { left: 0; right: 0; }
+    .logo svg { transition: transform .25s; }
+    .logo:hover svg { transform: rotate(-8deg) scale(1.08); }
+  }
+  .primary .ico { transition: transform .2s; }
+  .lang { position: relative; }
+  .lang-btn {
+    display: inline-flex; align-items: center; gap: 7px; min-height: 42px; padding: 0 12px; border-radius: 12px; cursor: pointer;
+    font: 700 14px 'Noto Sans Georgian', system-ui, sans-serif; color: var(--ink);
+    border: 1.5px solid rgba(255, 255, 255, .35); background: rgba(255, 255, 255, .06); backdrop-filter: blur(6px);
+  }
+  .lang-btn svg { width: 18px; height: 18px; flex: none; }
+  .lang-btn .chev { width: 12px; height: 12px; transition: transform .2s; }
+  .lang-btn[aria-expanded="true"] .chev { transform: rotate(180deg); }
+  /* ჩამოსაშლელი სია „იზრდება“ ღილაკიდან: ზედა ზოლი (ენა + გლობუსი/კოდი) იკავებს ღილაკის ადგილს */
+  .lang-menu {
+    --bw: 96px; --bh: 42px;                                   /* ღილაკის ზომა — JS ანახლებს */
+    position: absolute; z-index: 3; top: 0; right: 0; width: 236px; padding-bottom: 6px; border-radius: 14px;
+    background: linear-gradient(180deg, rgba(30, 36, 62, .97), rgba(18, 21, 40, .97));
+    border: 1px solid rgba(255, 255, 255, .14); box-shadow: 0 18px 40px rgba(0, 0, 0, .5);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    clip-path: inset(0 0 calc(100% - var(--bh)) calc(100% - var(--bw)) round 12px);
+    opacity: 0; visibility: hidden;
+    transition: clip-path .34s cubic-bezier(.4, 0, .2, 1), opacity .18s .16s, visibility 0s .34s;
+  }
+  .lang-menu.open {
+    clip-path: inset(0 0 0 0 round 14px); opacity: 1; visibility: visible;
+    transition: clip-path .38s cubic-bezier(.2, .9, .25, 1), opacity .12s, visibility 0s;
+  }
+  .lang-head {
+    width: 100%; height: var(--bh); display: flex; align-items: center; justify-content: space-between; padding: 0 13px 0 16px;
+    border: 0; border-bottom: 1px solid rgba(255, 255, 255, .1); background: none; color: var(--ink); cursor: pointer;
+    font: 700 14px 'Noto Sans Georgian', system-ui, sans-serif;
+  }
+  .lang-title { color: var(--muted); font-weight: 600; }
+  .lang-now { display: inline-flex; align-items: center; gap: 7px; }
+  .lang-now svg { width: 18px; height: 18px; }
+  .lang-now .chev { width: 12px; height: 12px; transform: rotate(180deg); }
+  .lang-list { padding: 6px 6px 0; }
+  .lang-list button {
+    width: 100%; display: grid; grid-template-columns: 40px 1fr 16px; align-items: center; gap: 6px;
+    padding: 10px 10px; border: 0; border-radius: 10px; background: none; cursor: pointer; text-align: left;
+    color: var(--ink); font: 600 15px system-ui, 'Noto Sans Georgian', sans-serif;
+    opacity: 0; transform: translateY(-6px); transition: opacity .16s, transform .16s, background .15s;
+  }
+  .lang-menu.open .lang-list button { opacity: 1; transform: none; transition: opacity .26s calc(90ms + var(--i) * 28ms), transform .26s calc(90ms + var(--i) * 28ms), background .15s; }
+  .lang-list small { color: var(--muted); font-size: 11.5px; font-weight: 700; letter-spacing: .04em; }
+  .lang-list .check { width: 16px; height: 16px; color: #ffd99a; opacity: 0; }
+  .lang-list button:hover { background: rgba(255, 255, 255, .07); }
+  .lang-list button.on { background: rgba(255, 255, 255, .09); }
+  .lang-list button.on .check { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .lang-menu, .lang-list button { transition: none !important; } }
+
+  /* ---------- მთავარი ეკრანი ---------- */
+  main { position: relative; z-index: 1; }
+  .hero { position: relative; height: 100svh; overflow: hidden;   /* ჰალო ეკრანს არ სცდება — გვერდი გვერდულად არ „ფართოვდება“ */
+    display: flex; align-items: center; padding: 96px clamp(16px, 7vw, 128px) 64px; }
+  .hero::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(90deg, rgba(8, 5, 16, .62) 0%, rgba(8, 5, 16, .32) 34%, rgba(8, 5, 16, 0) 58%);
+    /* ქვემოთ რბილად ქრება — მკვეთრი ხაზი არ ჩანს */
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 45%, transparent 85%);
+    mask-image: linear-gradient(180deg, #000 0%, #000 45%, transparent 85%);
+  }
+  .hero-inner { position: relative; max-width: 610px; }
+  /* ტექსტის უკან რბილი მუქი „ჰალო“ — კიდეებზე ქრება, ჩარჩო არ ჩანს; ნათელ ფონზეც ტექსტი კარგად იკითხება */
+  .hero-inner::before {
+    content: ''; position: absolute; z-index: -1; inset: -70px -110px -60px -90px; pointer-events: none;
+    background: radial-gradient(closest-side, rgba(10, 6, 24, .62), rgba(10, 6, 24, .38) 55%, rgba(10, 6, 24, 0));
+  }
+  .eyebrow {
+    display: inline-flex; gap: 8px; align-items: center; margin-bottom: 18px; padding: 6px 14px; border-radius: 999px;
+    font-size: 14px; font-weight: 600; color: #ffd99a; background: rgba(255, 200, 120, .12); border: 1px solid rgba(255, 200, 120, .3);
+  }
+  h1 { font-family: 'Noto Serif Georgian', serif; font-weight: 900; font-size: clamp(32px, 3.8vw, 54px); line-height: 1.15; text-shadow: 0 4px 24px rgba(0, 0, 0, .45); }
+  h1 span, h2 span { background: linear-gradient(180deg, #ffe29a, #f2a33a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  /* სათაურის ქვეშ ოქროს ორნამენტი: ხაზი — რომბი — ხაზი */
+  .divider { display: flex; align-items: center; gap: 10px; margin: 16px 0 14px; }
+  .divider i { width: 54px; height: 1.5px; background: linear-gradient(90deg, transparent, #f2b54a); }
+  .divider i:last-child { transform: scaleX(-1); }
+  .divider b { width: 9px; height: 9px; transform: rotate(45deg); background: linear-gradient(135deg, #ffe29a, #e09a2c); box-shadow: 0 0 10px rgba(242, 181, 74, .7); }
+  .hero p strong { color: #ffd99a; font-weight: 600; white-space: nowrap; }
+  .hero p span { display: block; text-wrap: balance; }
+  .hero p { margin-top: 0; max-width: 500px; font-size: clamp(15px, 1.2vw, 18px); line-height: 1.7; color: #f3eadb; text-shadow: 0 1px 2px rgba(0, 0, 0, .7), 0 2px 14px rgba(0, 0, 0, .65); }
+  .cta { display: flex; gap: 12px; margin-top: 26px; flex-wrap: wrap; }
+  .chips { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .chips span {
+    display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px 5px 6px; border-radius: 999px;
+    font-size: 13px; font-weight: 700; color: #f1e6d4; background: rgba(14, 9, 30, .5); border: 1px solid rgba(255, 255, 255, .14);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
+  .chips b {
+    display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; font-size: 11px;
+    color: #10301a; background: linear-gradient(180deg, #9ff0a8, #4cc463);
+  }
+  .hero .ghost { background: rgba(14, 9, 30, .42); border-color: rgba(255, 255, 255, .45); text-shadow: 0 1px 3px rgba(0, 0, 0, .5); }
+
+  /* ---------- რას ვასწავლით: საგნები და სწავლების ენები — კომპაქტურად, მთავარ ტექსტთან ერთად ---------- */
+  .teach {
+    margin-top: 18px; padding: 6px 18px; border-radius: 18px; max-width: 600px;
+    background: linear-gradient(180deg, rgba(22, 15, 44, .66), rgba(12, 8, 26, .52));
+    border: 1px solid rgba(242, 181, 74, .3); box-shadow: 0 12px 30px rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .06);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .t-row { padding: 10px 0; }
+  .t-row + .t-row { border-top: 1px solid; border-image: linear-gradient(90deg, rgba(242, 181, 74, .45), rgba(242, 181, 74, 0)) 1; }
+  .t-label { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; font-size: 13px; font-weight: 800; letter-spacing: .02em; color: #ffd99a; }
+  .t-label span {
+    display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; flex: none;
+    background: linear-gradient(180deg, #ffe29a, #e09a2c); color: #3a1d05; box-shadow: 0 0 10px rgba(242, 181, 74, .45);
+  }
+  .t-label svg { width: 14px; height: 14px; }
+  .t-items { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font: 600 14px system-ui, 'Noto Sans Georgian', sans-serif; color: #f4f1ff; line-height: 1.45; }
+  .t-items i { width: 5px; height: 5px; transform: rotate(45deg); background: #f2b54a; opacity: .8; }       /* ოქროს რომბი-გამყოფი */
+  .pill {
+    padding: 3px 11px; border-radius: 999px; font-size: 13.5px; font-weight: 700; line-height: 1.45; font-family: 'Noto Sans Georgian', sans-serif;
+    color: #ffe7b8; background: rgba(242, 181, 74, .16); border: 1px solid rgba(242, 181, 74, .42);
+  }
+
+
+  /* „დაიწყე“ ღილაკი სცენაზე: ტელეფონზე — ბილიკზე, კომპიუტერზე — მარჯვნივ, ბოროტების მიწაზე
+     (ადგილს JS ითვლის, fit() ფუნქციაში); ტექსტის ქვეშ ღილაკი აღარ არის */
+  .hero .cta { display: none; }
+  .road-cta {
+    position: fixed; left: 50%; transform: translate(-50%, -50%); z-index: 5;
+    min-height: 60px; padding: 0 34px 0 30px; gap: 11px; border-radius: 999px; font-size: 19px; letter-spacing: .02em;
+    border-width: 2px; transition: opacity .25s, transform .18s, filter .2s;
+    animation: beacon 2s ease-out infinite, bob 3.2s ease-in-out infinite;                 /* ფეთქავს და ოდნავ ტივტივებს */
+  }
+  .road-cta .ico { width: 24px; height: 24px; }
+  .road-cta .go { width: 18px; height: 18px; margin-left: 2px; transition: transform .2s; }
+  .road-cta:hover .go { transform: translateX(4px); }
+  @keyframes bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -5px; } }
+  .road-cta:hover { transform: translate(-50%, calc(-50% - 2px)); }   /* hover — ცენტრი არ ირღვევა */
+  .road-cta:active { transform: translate(-50%, calc(-50% + 2px)); }
+
+  /* ---------- ტელეფონი ---------- */
+  @media (max-aspect-ratio: 1/1), (max-width: 760px) {
+    .hero { align-items: flex-start; padding-top: 72px; }
+    .hero::before { background: linear-gradient(180deg, rgba(8, 5, 16, .55) 0%, rgba(8, 5, 16, .25) 34%, rgba(8, 5, 16, 0) 46%); }
+  }
+  @media (max-width: 760px) {
+    .links { display: none; }
+    /* შესვლა ტელეფონზე — მხოლოდ მომხმარებლის ხატულა, მრგვალ ღილაკში */
+    .btn.small.login { width: 44px; height: 44px; min-height: 44px; padding: 0; border-radius: 50%; }
+    .login-text { display: none; }
+    .login-ico { display: block; }
+    .actions { gap: 8px; }
+    .lang-btn { min-height: 44px; padding: 0 11px; border-radius: 999px; }   /* ტელეფონზე — მრგვალებული, შესვლის ღილაკის სიმაღლის */
+    /* მთავარი ეკრანი ტელეფონზე — მარტივი და სუფთა: სათაური, მოკლე ტექსტი, ერთი მომრგვალებული ღილაკი */
+    .eyebrow, .chips, .hero .btn.ghost { display: none; }
+    .hero-inner { margin: 0 auto; text-align: center; }
+    .hero h1 { font-size: clamp(30px, 9vw, 40px); line-height: 1.18; }
+    .hero h1 span { display: block; }
+    .divider { justify-content: center; margin: 10px auto 8px; }
+    .hero p { max-width: 330px; margin: 0 auto; font-size: 15px; line-height: 1.6; color: #eadfce; }
+    .cta { margin-top: 22px; }
+    .teach { margin: 12px auto 0; padding: 2px 12px; max-width: 360px; border-radius: 14px; }
+    .t-row { padding: 7px 0; }
+    /* ტელეფონზე: სტრიქონის სათაური იმალება, რჩება მხოლოდ ოქროს ხატულა რიგის დასაწყისში — ბარათი დაბალია */
+    .t-row { display: flex; align-items: flex-start; justify-content: center; gap: 8px; }
+    .t-label { margin: 1px 0 0; font-size: 0; gap: 0; }
+    .t-label span { width: 20px; height: 20px; }
+    .t-label svg { width: 12px; height: 12px; }
+    .t-items { justify-content: flex-start; gap: 4px 7px; font-size: 12.5px; }
+    .pill { padding: 2px 8px; font-size: 12px; }
+    .pill.geo { display: none; }   /* ტელეფონზე გეოგრაფიას თავისი რიგი აქვს (რუკის ხატულით) — ენები ერთ ხაზზე ეტევა */
+    .hero p span + span { display: none; }   /* ტელეფონზე მეორე წინადადება იმალება — ადგილი სცენას რჩება */
+  }
+
+  /* ---------- ფონი ---------- */
+  .scene { position: fixed; inset: 0; overflow: hidden; background: linear-gradient(180deg,#34437f 0%,#7a6aa6 26%,#e8998a 50%,#ffcf98 68%,#ffe2b0 100%); }
+  .scene svg { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; }
+  .twinkle { animation: twinkle 3s ease-in-out infinite alternate; }
+
+  /* ---------- ანიმაციები ---------- */
+  .flag { transform-box: fill-box; transform-origin: 0% 50%; animation: wave 2.6s ease-in-out infinite alternate; }
+  .flicker { transform-box: fill-box; transform-origin: 50% 100%; animation: flicker 1.3s ease-in-out infinite alternate; }
+  .pulse { transform-box: fill-box; transform-origin: center; animation: pulse 3s ease-in-out infinite alternate; }
+  .drift { animation: drift 38s ease-in-out infinite alternate; }
+  @keyframes wave { from { transform: skewY(-4deg) scaleX(.93); } to { transform: skewY(3deg) scaleX(1); } }
+  @keyframes flicker { from { opacity: .7; transform: scale(.93); } to { opacity: 1; transform: scale(1.05); } }
+  @keyframes pulse { from { opacity: .6; transform: scale(.9); } to { opacity: 1; transform: scale(1.08); } }
+  @keyframes drift { from { transform: translateX(-40px); } to { transform: translateX(40px); } }
+  @keyframes twinkle { from { opacity: .25; } to { opacity: 1; } }
+  .ember { transform-box: fill-box; animation: ember 4s linear infinite; }
+  .swing { animation: swing 3.2s ease-in-out infinite alternate; transform-origin: 0 0; }
+  @keyframes swing { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+  @keyframes ember { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(14px, -130px); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  /* დაბალი ტელეფონი: მეორე წინადადება იმალება, რომ სცენას ადგილი დარჩეს */
+  /* ძალიან დაბალი ტელეფონი: ენების რიგი იმალება (ენები ზედა ღილაკშიც არის), რომ სცენა და ღილაკი ჩაეტიოს */
+  @media (max-width: 760px) and (max-height: 720px) { .t-row:nth-child(3) { display: none; } }
+</style>
+</head>
+<body>
+
+<div class="scene">
+  <svg id="bg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice" viewBox="0 0 1600 900"></svg>
+</div>
+
+<header class="top" id="top">
+  <a class="logo" href="#" aria-label="მთავარი">
+    <!-- დროებითი ლოგო: ხმალი გვირგვინით (თამაშის სახელი ჯერ არ არის არჩეული) -->
+    <svg viewBox="0 0 40 40" aria-hidden="true">
+      <rect x="18" y="8" width="2" height="26" fill="#eef3f9"/><rect x="20" y="8" width="2" height="26" fill="#2a2030"/>
+      <rect x="11" y="8" width="9" height="3" rx="1.5" fill="#e8b84a"/><rect x="20" y="8" width="9" height="3" rx="1.5" fill="#1e1820"/>
+      <rect x="19" y="2" width="2" height="6" fill="#7a4a2a"/><circle cx="20" cy="2" r="2" fill="#e8b84a"/>
+      <path d="M7,17 L9,11 L12,15 L14,10 L16,15 L18,12 L18,19 L7,19 Z" fill="#f2c44e"/><circle cx="12.5" cy="17" r="1.2" fill="#d42a2a"/>
+    </svg>
+  </a>
+  <div class="actions">
+  <div class="lang">
+    <button type="button" class="lang-btn" id="langBtn" aria-haspopup="true" aria-expanded="false" aria-label="ენის შეცვლა">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12 H21 M12 3 C15 6 15 18 12 21 C9 18 9 6 12 3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+      <span id="langCode">ქარ</span>
+      <svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 L6 8 L9.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="lang-menu" id="langMenu" role="menu">
+      <button type="button" class="lang-head" id="langHead" aria-label="ენის სიის დახურვა">
+        <span class="lang-title">ენა</span>
+        <span class="lang-now"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12 H21 M12 3 C15 6 15 18 12 21 C9 18 9 6 12 3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span id="langHeadCode">ქარ</span><svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 L6 8 L9.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </button>
+      <div class="lang-list">
+        <button type="button" role="menuitem" data-code="KA" data-short="ქარ" style="--i:0"><small>ქარ</small><span>ქართული</span><svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" role="menuitem" data-code="EN" data-short="ENG" style="--i:1"><small>ENG</small><span>English</span><svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" role="menuitem" data-code="TR" data-short="TUR" style="--i:2"><small>TUR</small><span>Türkçe</span><svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" role="menuitem" data-code="HY" data-short="HYE" style="--i:3"><small>HYE</small><span>Հայերեն</span><svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" role="menuitem" data-code="AZ" data-short="AZE" style="--i:4"><small>AZE</small><span>Azərbaycanca</span><svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" role="menuitem" data-code="RU" data-short="RUS" style="--i:5"><small>RUS</small><span>Русский</span><svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" role="menuitem" data-code="KK" data-short="KAZ" style="--i:6"><small>KAZ</small><span>Қазақша</span><svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" role="menuitem" data-code="UZ" data-short="UZB" style="--i:7"><small>UZB</small><span>Oʻzbekcha</span><svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+  </div>
+  <a class="btn small ghost login" href="#" aria-label="შესვლა">
+    <svg class="login-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4.5 20.5 C5.5 16 8.5 14 12 14 C15.5 14 18.5 16 19.5 20.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span class="login-text">შესვლა</span>
+  </a>
+  </div>
+</header>
+
+
+<main>
+  <section class="hero" id="home">
+    <div class="hero-inner">
+      <div class="eyebrow">⚔️ სასწავლო სტრატეგიული თამაში</div>
+      <h1>ისწავლე. ააშენე. <span>იმეფე.</span></h1>
+      <div class="divider" aria-hidden="true"><i></i><b></b><i></i></div>
+      <p><span>ისწავლე ენები და გეოგრაფია — თამაშით და <strong>სრულიად უფასოდ</strong>.</span> <span>ყოველი სწორი პასუხი შენს სამეფოს აძლიერებს.</span></p>
+      <div class="teach">
+        <div class="t-row">
+          <div class="t-label"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5 C6 4 9 4 12 6 C15 4 18 4 21 5.5 V19 C18 17.5 15 17.5 12 19.5 C9 17.5 6 17.5 3 19 Z M12 6 V19.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg></span>რას ისწავლი</div>
+          <div class="t-items"><span class="pill">ინგლისური</span><span class="pill">ესპანური</span><span class="pill">გერმანული</span><span class="pill">ფრანგული</span><span class="pill geo">გეოგრაფია</span></div>
+        </div>
+        <div class="t-row">
+          <div class="t-label"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5 L9 4.5 L15 6.5 L20 4.5 V17.5 L15 19.5 L9 17.5 L4 19.5 Z M9 4.5 V17.5 M15 6.5 V19.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg></span>გეოგრაფიაში</div>
+          <div class="t-items">ქვეყნები და დედაქალაქები <i></i> დროშები <i></i> რუკები <i></i> ღირსშესანიშნაობები</div>
+        </div>
+        <div class="t-row">
+          <div class="t-label"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 A9 9 0 1 0 12 21 A9 9 0 1 0 12 3 Z M3 12 H21 M12 3 C15 6 15 18 12 21 C9 18 9 6 12 3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg></span>სწავლების ენები</div>
+          <div class="t-items">ქართული <i></i> English <i></i> Türkçe <i></i> Հայերեն <i></i> Azərbaycanca <i></i> Русский <i></i> Қазақша <i></i> Oʻzbekcha</div>
+        </div>
+      </div>
+      <div class="cta">
+        <a class="btn primary" href="#"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><g transform="rotate(-42 12 12)"><path d="M12 1.5 L13.4 4 L13.4 15 L10.6 15 L10.6 4 Z"/><rect x="7.6" y="15" width="8.8" height="1.9" rx=".9"/><rect x="11.1" y="16.9" width="1.8" height="3.8"/><circle cx="12" cy="21.6" r="1.5"/></g><g transform="rotate(42 12 12)"><path d="M12 1.5 L13.4 4 L13.4 15 L10.6 15 L10.6 4 Z"/><rect x="7.6" y="15" width="8.8" height="1.9" rx=".9"/><rect x="11.1" y="16.9" width="1.8" height="3.8"/><circle cx="12" cy="21.6" r="1.5"/></g></svg><span>დაიწყე</span></a>
+      </div>
+      <div class="chips"><span><b>✓</b>რეგისტრაცია უფასოა</span><span><b>✓</b>მუშაობს ტელეფონზე</span></div>
+    </div>
+    <a class="btn primary road-cta" id="roadCta" href="#"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><g transform="rotate(-42 12 12)"><path d="M12 1.5 L13.4 4 L13.4 15 L10.6 15 L10.6 4 Z"/><rect x="7.6" y="15" width="8.8" height="1.9" rx=".9"/><rect x="11.1" y="16.9" width="1.8" height="3.8"/><circle cx="12" cy="21.6" r="1.5"/></g><g transform="rotate(42 12 12)"><path d="M12 1.5 L13.4 4 L13.4 15 L10.6 15 L10.6 4 Z"/><rect x="7.6" y="15" width="8.8" height="1.9" rx=".9"/><rect x="11.1" y="16.9" width="1.8" height="3.8"/><circle cx="12" cy="21.6" r="1.5"/></g></svg><span>დაიწყე</span><svg class="go" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12 H19 M13 6 L19 12 L13 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  </section>
+
+</main>
+
+<script>
+/* =========================================================
+   მთავარი გვერდის ფონი — დახატულია კოდით (SVG).
+   მარცხნივ სიკეთის სამეფო, მარჯვნივ ბოროტების მხარე,
+   ცენტრში — ქვაში ჩარჭობილი ხმალი გვირგვინით.
+   ყველა ობიექტი ცალკე ფუნქციაა, რომ მერე ადვილად
+   შევცვალოთ ნამდვილი გრაფიკით.
+   ========================================================= */
+const W = 1600, H = 900;
+
+const P = n => Math.round(n * 10) / 10;
+
+const rng = seed => { let s = seed % 233280; return () => (s = (s * 9301 + 49297) % 233280) / 233280; };
+
+function defs(id) {
+  return `<defs>
+    <radialGradient id="${id}-glow"><stop offset="0" stop-color="#ffb35c" stop-opacity=".85"/><stop offset="1" stop-color="#ffb35c" stop-opacity="0"/></radialGradient>
+    <radialGradient id="${id}-sunglow"><stop offset="0" stop-color="#fff1c9" stop-opacity=".85"/><stop offset=".3" stop-color="#ffc56b" stop-opacity=".4"/><stop offset="1" stop-color="#ff9a4a" stop-opacity="0"/></radialGradient>
+    <filter id="${id}-blur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="14"/></filter>
+    <linearGradient id="${id}-beam" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#fff6c8" stop-opacity=".75"/><stop offset="1" stop-color="#fff6c8" stop-opacity="0"/></linearGradient>
+    <radialGradient id="${id}-cglow"><stop offset="0" stop-color="#d8f4ff" stop-opacity=".9"/><stop offset=".45" stop-color="#7ab8ff" stop-opacity=".35"/><stop offset="1" stop-color="#7ab8ff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="${id}-evilglow"><stop offset="0" stop-color="#ff3a1a" stop-opacity=".85"/><stop offset=".4" stop-color="#d0201a" stop-opacity=".35"/><stop offset="1" stop-color="#a0101a" stop-opacity="0"/></radialGradient>
+    <linearGradient id="${id}-lava" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd25a"/><stop offset=".5" stop-color="#ff8a1a"/><stop offset="1" stop-color="#ff4a10"/></linearGradient>
+    <linearGradient id="${id}-fog" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${THEME.fog}" stop-opacity="0"/><stop offset=".55" stop-color="${THEME.fog}" stop-opacity=".6"/><stop offset="1" stop-color="${THEME.fog}" stop-opacity="0"/></linearGradient>
+    <pattern id="${id}-stone" width="26" height="14" patternUnits="userSpaceOnUse"><path d="M0,7 H26 M0,14 H26 M8,0 V7 M21,7 V14" stroke="#3a2a1a" stroke-opacity=".18" stroke-width="1" fill="none"/></pattern>
+  </defs>`;
+}
+
+// ---------- ჰაერის ბურუსი (შორეული ობიექტები ღია და მკრთალია) ----------
+const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+
+const mix = (a, b, t) => '#' + hex(a).map((v, i) => Math.round(v + (hex(b)[i] - v) * t).toString(16).padStart(2, '0')).join('');
+
+const hazed = (c, to, t) => Object.fromEntries(Object.entries(c).map(([k, v]) => [k, /^#[0-9a-f]{6}$/i.test(v) ? mix(v, to, t) : v]));
+
+const fog = (y, h, op, id) => `<rect x="-200" y="${y}" width="2000" height="${h}" fill="url(#${id}-fog)" opacity="${op}"/>`;
+
+// რბილი, ფართო ქედი; y(x) აბრუნებს ქედის სიმაღლეს — ციხეს ზუსტად თხემზე ვსვამთ
+function hills(base, bumps, amp, seed, fill) {
+  const r = rng(seed), waves = [0, 1, 2].map(i => [amp * (r() * .6 + .4) / (i + 1), (r() * .004 + .002) * (i + 1), r() * 6.28]);
+  const y = x => base - bumps.reduce((s, [cx, h, w]) => s + h * Math.exp(-(((x - cx) / w) ** 2)), 0) + waves.reduce((s, [a, f, p]) => s + a * Math.sin(x * f + p), 0);
+  let d = `M-200,${H + 20}`;
+  for (let x = -200; x <= 1800; x += 10) d += ` L${x},${P(y(x))}`;
+  return { svg: `<path d="${d} L1800,${H + 20} Z" fill="${fill}"/>`, y };
+}
+
+// ---------- გალავნიანი ციხე-სიმაგრე (X–XV საუკუნე) ----------
+function fortress(x, y, s, c) {
+  const tex = el => c.texture ? el.replace(/fill="[^"]*"/, `fill="url(#${c.id}-stone)"`) : '';
+  const block = (x1, y1, w, h, fill = c.wall) => { const r = `<rect x="${x1}" y="${y1}" width="${w}" height="${h}" fill="${fill}"/>`; return r + tex(r); };
+  const cren = (x1, x2, top) => { let g = ''; for (let cx = x1; cx <= x2 - 7; cx += 13) g += `<rect x="${cx}" y="${top - 9}" width="7.5" height="9.5" fill="${c.wall}"/>`; return g; };
+  const slit = (sx, sy) => `<rect x="${P(sx - 1.8)}" y="${sy}" width="3.6" height="13" rx="1.5" fill="${c.dark}"/>`;
+  const pennant = (px, py) =>
+    `<line x1="${px}" y1="${py}" x2="${px}" y2="${py - 50}" stroke="${c.dark}" stroke-width="3"/>` +
+    `<g class="flag" style="animation-delay:-${(Math.random() * 2).toFixed(2)}s"><path d="M${px},${py - 50} L${px + 38},${py - 44} L${px + 34},${py - 37} L${px},${py - 32} Z" fill="${c.flag}"/></g>`;
+
+  // კვადრატული კოშკი სათოფურებით
+  const sqTower = (cx, base, w, h, o = {}) => {
+    const x1 = cx - w / 2, top = base - h;
+    let g = block(x1, top, w, h) + `<rect x="${P(x1 + w * .6)}" y="${top}" width="${P(w * .4)}" height="${h}" fill="${c.shade}"/>`;
+    g += `<rect x="${x1 - 4}" y="${top - 7}" width="${w + 8}" height="8" fill="${c.wall}"/><rect x="${P(x1 + w * .6)}" y="${top - 7}" width="${P(w * .4 + 4)}" height="8" fill="${c.shade}"/>`;
+    for (let k = x1 - 2; k < x1 + w + 2; k += 8) g += `<rect x="${k}" y="${top + 1}" width="4" height="4" fill="${c.dark}" opacity=".35"/>`;
+    if (o.roof) {
+      g += `<polygon points="${x1 - 6},${top - 7} ${cx},${top - 7 - o.roof} ${x1 + w + 6},${top - 7}" fill="${c.roof}"/><polygon points="${cx},${top - 7 - o.roof} ${x1 + w + 6},${top - 7} ${cx},${top - 7}" fill="${c.roofShade}"/>`;
+    } else g += cren(x1 - 4, x1 + w + 4, top - 7);
+    for (let sy = top + 20; sy < base - 26; sy += 36) g += slit(cx - w * .15, sy);
+    if (o.flag) g += pennant(cx, top - 7 - (o.roof || 9));
+    return g;
+  };
+
+  // მრგვალი კუთხის კოშკი
+  const roundTower = (cx, base, w, h) => {
+    const x1 = cx - w / 2, top = base - h;
+    let g = block(x1, top, w, h) + `<rect x="${P(x1 + w * .62)}" y="${top}" width="${P(w * .38)}" height="${h}" fill="${c.shade}"/>` +
+      `<rect x="${P(x1 + w * .1)}" y="${top}" width="${P(w * .12)}" height="${h}" fill="#fff" opacity=".1"/>`;
+    g += `<rect x="${x1 - 5}" y="${top - 9}" width="${w + 10}" height="10" fill="${c.wall}"/><rect x="${P(x1 + w * .62)}" y="${top - 9}" width="${P(w * .38 + 5)}" height="10" fill="${c.shade}"/>`;
+    g += cren(x1 - 5, x1 + w + 5, top - 9);
+    g += `<polygon points="${x1 - 7},${base} ${x1},${base - 24} ${x1 + w},${base - 24} ${x1 + w + 7},${base}" fill="${c.shade}"/>`;
+    for (let sy = top + 22; sy < base - 40; sy += 40) g += slit(cx - w * .12, sy);
+    return g;
+  };
+
+  // ჯვარ-გუმბათოვანი ეკლესია
+  const church = (cx, base) => {
+    let g = block(cx - 55, base - 62, 110, 62, c.wall2) + `<rect x="${cx + 12}" y="${base - 62}" width="43" height="62" fill="${c.shade}"/>`;
+    g += `<polygon points="${cx - 61},${base - 62} ${cx},${base - 94} ${cx + 61},${base - 62}" fill="${c.roof2}"/><polygon points="${cx},${base - 94} ${cx + 61},${base - 62} ${cx},${base - 62}" fill="${c.roofShade2}"/>`;
+    g += block(cx - 16, base - 134, 32, 44, c.wall2) + `<rect x="${cx + 4}" y="${base - 134}" width="12" height="44" fill="${c.shade}"/>`;
+    g += `<rect x="${cx - 8}" y="${base - 124}" width="5" height="14" rx="2.5" fill="${c.dark}"/><rect x="${cx + 4}" y="${base - 124}" width="5" height="14" rx="2.5" fill="${c.dark}"/>`;
+    g += `<polygon points="${cx - 20},${base - 134} ${cx},${base - 166} ${cx + 20},${base - 134}" fill="${c.roof2}"/><polygon points="${cx},${base - 166} ${cx + 20},${base - 134} ${cx},${base - 134}" fill="${c.roofShade2}"/>`;
+    g += `<rect x="${cx - 1.3}" y="${base - 182}" width="2.6" height="16" fill="${c.gold}"/><rect x="${cx - 5.5}" y="${base - 177}" width="11" height="2.6" fill="${c.gold}"/>`;
+    return g;
+  };
+
+  // სხვადასხვა ტიპის ციხე — რომ ყველა ციხე ერთნაირი არ იყოს
+  const cone = (cx, top, w, h, red) =>
+    `<polygon points="${cx - w / 2 - 6},${top} ${cx},${top - h} ${cx + w / 2 + 6},${top}" fill="${red ? c.roof : c.slate}"/><polygon points="${cx},${top - h} ${cx + w / 2 + 6},${top} ${cx},${top}" fill="${red ? c.roofShade : c.slateShade}"/>`;
+  const gate = (gx, gy, w) => `<path d="M${gx - w},${gy} V${P(gy - w * 2.6)} A${w},${w} 0 0 1 ${gx + w},${P(gy - w * 2.6)} V${gy} Z" fill="${c.dark}"/>`;
+  const hilltop = (w, d) => `<polygon points="${-w},12 ${-w + 110},${-d} ${w - 110},${-d} ${w},12" fill="${c.ground}"/>`;
+  const wrap = g => `<g transform="translate(${x},${y}) scale(${s})">${g}</g>`;
+
+  if (c.type === 'keep') {          // ნორმანული დონჟონი: დიდი კვადრატული კოშკი კუთხის ბურჯებით
+    let g = hilltop(260, 60) + sqTower(0, -40, 170, 250);
+    for (const tx of [-71, 71]) g += block(tx - 14, -340, 28, 50) + `<rect x="${tx + 2}" y="-340" width="12" height="50" fill="${c.shade}"/>` + cone(tx, -340, 28, 36);
+    g += pennant(0, -306);
+    g += block(-220, -74, 440, 74) + `<rect x="-220" y="-16" width="440" height="16" fill="${c.shade}" opacity=".55"/>` + cren(-220, 220, -74) + gate(0, 0, 17);
+    g += roundTower(-220, 0, 54, 120) + roundTower(220, 0, 54, 120);
+    return wrap(g);
+  }
+  if (c.type === 'round') {         // მრგვალი კოშკები მაღალი კონუსური სახურავებით
+    let g = hilltop(300, 70) + block(-170, -134, 340, 60) + cren(-170, 170, -134);
+    g += roundTower(-170, -74, 54, 150) + cone(-170, -233, 54, 70) + roundTower(170, -74, 54, 130) + cone(170, -213, 54, 62);
+    g += roundTower(0, -50, 100, 250) + cone(0, -309, 100, 120) + pennant(0, -429);
+    g += block(-240, -92, 480, 92) + `<rect x="-240" y="-18" width="480" height="18" fill="${c.shade}" opacity=".55"/>` + cren(-240, 240, -92);
+    g += roundTower(-38, 0, 46, 132) + cone(-38, -141, 46, 50) + roundTower(38, 0, 46, 132) + cone(38, -141, 46, 50) + gate(0, 0, 16);
+    g += roundTower(-240, 0, 66, 165) + cone(-240, -174, 66, 84) + roundTower(240, 0, 66, 165) + cone(240, -174, 66, 84);
+    return wrap(g);
+  }
+  if (c.type === 'georgian') {      // ქართული ციხე: საფეხურებიანი გალავანი, მაღალი კოშკები, გუმბათოვანი ეკლესია
+    let g = hilltop(300, 90);
+    g += sqTower(-160, -70, 72, 250, { roof: 62, flag: true }) + church(50, -96) + sqTower(190, -60, 62, 175, { roof: 52 });
+    const wallP = `<polygon points="-270,0 -270,-84 -120,-84 -120,-112 130,-112 130,-84 270,-84 270,0" fill="${c.wall}"/>`;
+    g += wallP + tex(wallP) + `<rect x="-270" y="-18" width="540" height="18" fill="${c.shade}" opacity=".55"/>`;
+    g += cren(-270, -120, -84) + cren(-120, 130, -112) + cren(130, 270, -84) + gate(-40, 0, 18);
+    g += roundTower(-270, 0, 48, 118) + roundTower(270, 0, 48, 118);
+    return wrap(g);
+  }
+  return '';
+}
+
+// ---------- ბოროტების მხარე ----------
+// ბნელი ციტადელი: წვეტიანი კოშკები, ეკლიანი გვირგვინი, წითლად მანათობელი ფანჯრები
+function darkCitadel(x, y, s, c) {
+  const glowWin = (wx, wy) => `<circle cx="${wx}" cy="${wy + 8}" r="16" fill="url(#${c.id}-glow)" opacity=".8"/><rect x="${wx - 2.5}" y="${wy}" width="5" height="16" fill="${c.win}"/>`;
+  const spire = (cx, base, w, h, crown) => {
+    const tw = w * .62, top = base - h;
+    let g = `<polygon points="${cx - w / 2},${base} ${P(cx - tw / 2)},${top} ${P(cx + tw / 2)},${top} ${cx + w / 2},${base}" fill="${c.stone}"/>`;
+    g += `<polygon points="${P(cx + w * .08)},${base} ${P(cx + tw * .08)},${top} ${P(cx + tw / 2)},${top} ${cx + w / 2},${base}" fill="${c.shade}"/>`;
+    g += `<polygon points="${cx - w / 2},${base} ${P(cx - tw / 2)},${top} ${P(cx - tw / 2 + 4)},${top} ${cx - w / 2 + 7},${base}" fill="${c.rim}" opacity=".6"/>`;
+    g += `<polygon points="${cx - w / 2 - 14},${base} ${cx - w / 2},${P(base - h * .35)} ${cx - w / 2 + 2},${base}" fill="${c.stone}"/><polygon points="${cx + w / 2 + 14},${base} ${cx + w / 2},${P(base - h * .35)} ${cx + w / 2 - 2},${base}" fill="${c.shade}"/>`;
+    if (crown) {
+      let pts = `${P(cx - tw / 2 - 8)},${top + 6}`;
+      for (let i = 0; i < 5; i++) {
+        const sx = cx - tw / 2 + tw * (i + .5) / 5, sw = tw / 5 * .45, sh = i === 2 ? h * .32 : (i % 2 ? h * .12 : h * .18);
+        pts += ` ${P(sx - sw)},${top} ${P(sx)},${P(top - sh)} ${P(sx + sw)},${top}`;
+      }
+      g += `<circle cx="${cx}" cy="${top - 10}" r="${w * 1.1}" fill="url(#${c.id}-evilglow)" class="pulse"/>`;
+      g += `<polygon points="${pts} ${P(cx + tw / 2 + 8)},${top + 6}" fill="${c.stone}"/>`;
+      g += `<path d="M${P(cx - tw / 2)},${top + 14} Q${P(cx - tw / 2 - w * .7)},${P(top - h * .02)} ${P(cx - tw / 2 - w * .55)},${P(top - h * .2)} Q${P(cx - tw / 2 - w * .35)},${P(top - h * .02)} ${P(cx - tw / 2 + 2)},${top + 30} Z" fill="${c.stone}"/>`;
+      g += `<path d="M${P(cx + tw / 2)},${top + 14} Q${P(cx + tw / 2 + w * .7)},${P(top - h * .02)} ${P(cx + tw / 2 + w * .55)},${P(top - h * .2)} Q${P(cx + tw / 2 + w * .35)},${P(top - h * .02)} ${P(cx + tw / 2 - 2)},${top + 30} Z" fill="${c.shade}"/>`;
+    } else {
+      g += `<polygon points="${P(cx - tw / 2 - 5)},${top} ${cx},${P(top - h * .45)} ${P(cx + tw / 2 + 5)},${top}" fill="${c.stone}"/><polygon points="${cx},${P(top - h * .45)} ${P(cx + tw / 2 + 5)},${top} ${cx},${top}" fill="${c.shade}"/>`;
+    }
+    for (let wy = top + 26; wy < base - 40; wy += 48) g += glowWin(cx, wy);
+    return g;
+  };
+  let g = `<polygon points="-260,14 -220,-30 -150,-20 -120,-48 120,-48 160,-24 230,-34 260,14" fill="${c.rock}"/>`; // კლდოვანი საძირკველი
+  g += spire(-150, -30, 50, 210) + spire(150, -30, 50, 180);
+  g += spire(0, -40, 96, 420, true);                                                                           // მთავარი კოშკი
+  let teeth = '';
+  for (let tx = -190; tx < 190; tx += 19) teeth += `${tx},-120 ${tx + 9.5},-142 `;
+  g += `<rect x="-190" y="-120" width="380" height="96" fill="${c.stone}"/><rect x="20" y="-120" width="170" height="96" fill="${c.shade}"/>`;
+  g += `<polygon points="-190,-119 ${teeth}190,-120 190,-119" fill="${c.stone}"/>`;                           // კედელი სამკუთხა კბილებით
+  g += `<circle cx="0" cy="-55" r="70" fill="url(#${c.id}-evilglow)"/><path d="M-26,-24 L-26,-70 Q-26,-96 0,-112 Q26,-96 26,-70 L26,-24 Z" fill="#12080a"/>`;
+  g += `<path d="M-18,-24 V-80 M-6,-24 V-98 M6,-24 V-98 M18,-24 V-80" stroke="${c.win}" stroke-width="2" opacity=".55"/>`; // კარიბჭე
+  g += spire(-205, -20, 44, 150) + spire(205, -20, 44, 140);
+  for (let k = -240; k <= 240; k += 22) g += `<polygon points="${k - 4},-14 ${k + 8},-46 ${k + 6},-12" fill="${c.shade}"/>`; // ეკლები
+  return `<g transform="translate(${x},${y}) scale(${s})">${g}</g>`;
+}
+
+function volcano(cx, base, w, top, id) {
+  const cw = w * .16, h = base - top;
+  return `<circle cx="${cx}" cy="${top}" r="${w * .6}" fill="url(#${id}-evilglow)" class="pulse"/>` +
+    `<path d="M${cx - w},${base} L${P(cx - cw)},${top} L${P(cx + cw)},${top} L${cx + w},${base} Z" fill="#2a1c26"/>` +
+    `<path d="M${P(cx + cw * .2)},${top} L${P(cx + cw)},${top} L${cx + w},${base} L${P(cx + w * .1)},${base} Z" fill="#160e14" opacity=".7"/>` +
+    `<ellipse cx="${cx}" cy="${top}" rx="${P(cw)}" ry="${P(cw * .25)}" fill="#ffb43a"/>` +
+    `<path d="M${P(cx - cw * .4)},${top + 2} Q${P(cx - w * .2)},${P(top + h * .4)} ${P(cx - w * .35)},${base - 20}" stroke="#ff7a1a" stroke-width="5" fill="none" stroke-linecap="round"/>` +
+    `<path d="M${P(cx + cw * .3)},${top + 2} Q${P(cx + w * .1)},${P(top + h * .5)} ${P(cx + w * .25)},${base - 10}" stroke="#ff9a2a" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+}
+
+// ეკლიანი შავი კლდეები
+function crags(x0, x1, base, hMax, seed, fill) {
+  const r = rng(seed); let pts = `${x0},${H + 20} ${x0},${base}`;
+  for (let x = x0; x < x1; x += 18 + r() * 30) {
+    const h = hMax * (.3 + r() * .7) * (.4 + .6 * (1 - (x - x0) / (x1 - x0)));
+    pts += ` ${P(x + 8)},${P(base - h)} ${P(x + 20 + r() * 10)},${P(base - h * .2)}`;
+  }
+  return `<polygon points="${pts} ${x1},${base} ${x1},${H + 20}" fill="${fill}"/>`;
+}
+
+function deadTree(x, y, s, col = '#1a1216') {
+  return `<g transform="translate(${P(x)},${P(y)}) scale(${P(s)})"><path d="M-2,0 L-1.5,-40 L-12,-58 M-1.5,-40 L0,-64 M-1,-28 L10,-46 L15,-45 M0,-52 L7,-61 M-6,-50 L-14,-52" stroke="${col}" stroke-width="3" stroke-linecap="round" fill="none"/></g>`;
+}
+
+function deadForest(x0, x1, y0, y1, n, s0, s1, seed) {
+  const r = rng(seed), list = [];
+  for (let i = 0; i < n; i++) { const y = y0 + r() * (y1 - y0); list.push([x0 + r() * (x1 - x0), y, s0 + (y - y0) / (y1 - y0) * (s1 - s0)]); }
+  return list.sort((a, b) => a[1] - b[1]).map(([x, y, s]) => deadTree(x, y, s)).join('');
+}
+
+// დამწვარი, მოხრჩოლავე ნანგრევი
+function ruin(x, y, s, id) {
+  return `<g transform="translate(${x},${y}) scale(${s})">
+    <circle cx="-4" cy="-30" r="44" fill="url(#${id}-glow)" class="flicker"/>
+    <polygon points="-34,0 -34,-30 -26,-38 -20,-26 -12,-44 -4,-30 4,-34 10,-20 18,-28 30,-14 34,0" fill="#2a1c1c"/>
+    <polygon points="4,-34 10,-20 18,-28 30,-14 34,0 4,0" fill="#1a1012"/>
+    <rect x="-24" y="-22" width="8" height="12" fill="#ff7a2a" opacity=".85"/>
+    <path d="M-16,-30 Q-18,-52 -8,-68 Q-4,-54 0,-62 Q6,-46 2,-30 Z" fill="#ff8a2a" class="flicker"/>
+    <path d="M-11,-30 Q-12,-42 -6,-52 Q-1,-40 -1,-30 Z" fill="#ffe08a"/>
+  </g>`;
+}
+
+// ჰაერში მოფრენილი ნაპერწკლები
+function embers(x0, x1, y0, y1, n, seed) {
+  const r = rng(seed); let g = '';
+  for (let i = 0; i < n; i++)
+    g += `<circle class="ember" cx="${P(x0 + r() * (x1 - x0))}" cy="${P(y0 + r() * (y1 - y0))}" r="${P(1.2 + r() * 1.8)}" fill="${r() < .5 ? '#ffb347' : '#ff6a2a'}" style="animation-delay:-${(r() * 5).toFixed(2)}s;animation-duration:${(3 + r() * 3).toFixed(2)}s"/>`;
+  return g;
+}
+
+// ბნელი ციტადელის მეორე ტიპი: ობსიდიანის საფეხურებიანი პირამიდა (ზიკურატი) ლავის ღარით და ცეცხლით თავზე
+function obsidianZiggurat(x, y, s, c) {
+  const flame = (fx, fy, k) => `<circle cx="${fx}" cy="${fy - 8}" r="${22 * k}" fill="url(#${c.id}-glow)" class="flicker"/>` +
+    `<path d="M${fx - 7 * k},${fy} Q${fx - 9 * k},${fy - 14 * k} ${fx},${fy - 28 * k} Q${fx + 9 * k},${fy - 14 * k} ${fx + 7 * k},${fy} Z" fill="#ff8a2a" class="flicker"/>`;
+  let g = `<polygon points="-290,14 -250,-14 250,-14 290,14" fill="${c.rock}"/>`;
+  const tiers = [[440, 0], [340, -70], [240, -140], [140, -210]];
+  for (const [w, base] of tiers) {
+    const top = base - 70, hw = w / 2;
+    g += `<polygon points="${-hw},${base} ${-hw + 14},${top} ${hw - 14},${top} ${hw},${base}" fill="${c.stone}"/>`;
+    g += `<polygon points="${P(hw * .35)},${base} ${P(hw * .35)},${top} ${hw - 14},${top} ${hw},${base}" fill="${c.shade}"/>`;
+    g += `<rect x="${-hw + 14}" y="${top}" width="${w - 28}" height="4" fill="${c.rim}" opacity=".5"/>`;
+    for (let sx = -hw + 22; sx < hw - 20; sx += 22) g += `<polygon points="${sx - 5},${top} ${sx},${top - 11} ${sx + 5},${top}" fill="${c.stone}"/>`;
+    g += flame(-hw + 20, top, .8) + flame(hw - 20, top, .8);
+  }
+  // კიბე და ლავის ღარი შუაში
+  g += `<rect x="-26" y="-280" width="52" height="280" fill="${c.shade}"/>`;
+  for (let sy = -270; sy < 0; sy += 14) g += `<rect x="-26" y="${sy}" width="52" height="3" fill="${c.stone}"/>`;
+  g += `<rect x="-9" y="-280" width="18" height="280" fill="#ff5a14" filter="url(#${c.id}-blur)" opacity=".7"/><rect x="-5" y="-280" width="10" height="280" fill="url(#${c.id}-lava)"/>`;
+  // სალოცავი რქებით და უზარმაზარი ცეცხლი თავზე
+  g += `<rect x="-40" y="-340" width="80" height="62" fill="${c.stone}"/><rect x="8" y="-340" width="32" height="62" fill="${c.shade}"/>`;
+  g += `<path d="M-40,-334 Q-80,-370 -66,-420 Q-58,-376 -30,-352 Z M40,-334 Q80,-370 66,-420 Q58,-376 30,-352 Z" fill="${c.stone}"/>`;
+  g += `<circle cx="0" cy="-380" r="90" fill="url(#${c.id}-evilglow)" class="pulse"/>` + flame(0, -340, 2.6);
+  // კარიბჭე ძირში
+  g += `<circle cx="0" cy="-30" r="60" fill="url(#${c.id}-evilglow)"/><path d="M-30,0 V-44 L0,-66 L30,-44 V0 Z" fill="#12080a"/><path d="M-20,0 V-46 M0,0 V-60 M20,0 V-46" stroke="${c.win}" stroke-width="2.4" opacity=".6"/>`;
+  return `<g transform="translate(${x},${y}) scale(${s})">${g}</g>`;
+}
+
+// ---------- ცენტრალური ობიექტი (მთავარი ციხის ნაცვლად) ----------
+// ხმალი ქვაში: ძველი სვეტების წრე, შუაში ქვაში ჩარჭობილი ორმხრივი ხმალი
+function swordInStone(x, y, s, c, id) {
+  const pillar = (a, h, broken) => {
+    const px = P(205 * Math.cos(a * Math.PI / 180)), py = P(-16 + 32 * Math.sin(a * Math.PI / 180));
+    let g = `<rect x="${px - 11}" y="${py - h}" width="22" height="${h}" fill="${c.wall}"/><rect x="${px + 3}" y="${py - h}" width="8" height="${h}" fill="${c.shade}"/>`;
+    g += broken ? `<polygon points="${px - 11},${py - h} ${px - 4},${py - h - 12} ${px + 3},${py - h - 4} ${px + 11},${py - h - 16} ${px + 11},${py - h}" fill="${c.wall}"/>`
+                : `<rect x="${px - 15}" y="${py - h - 8}" width="30" height="8" fill="${c.wall2}"/>`;
+    return g;
+  };
+  let g = `<polygon points="-40,-200 40,-200 130,-900 -130,-900" fill="url(#${id}-beam)" opacity=".55"/>`;
+  g += `<ellipse cx="0" cy="0" rx="262" ry="46" fill="${c.rockShade}"/><ellipse cx="0" cy="-10" rx="232" ry="38" fill="${c.shade}"/><ellipse cx="0" cy="-22" rx="192" ry="30" fill="${c.wall}"/>`;
+  g += `<ellipse cx="0" cy="-22" rx="150" ry="22" fill="none" stroke="#9fe0ff" stroke-width="4" opacity=".85" class="pulse"/>`;
+  g += pillar(200, 130) + pillar(250, 100, true) + pillar(290, 140) + pillar(340, 110, true);
+  // ხმალი ქვაში: მარცხენა ნახევარი — სიკეთის (ვერცხლი, ოქრო, ლურჯი თვალი), მარჯვენა — ბოროტების (შავი ფოლადი, წითელი ბზარები)
+  g += `<circle cx="-40" cy="-240" r="140" fill="url(#${id}-cglow)" class="pulse"/><circle cx="40" cy="-232" r="125" fill="url(#${id}-evilglow)" class="pulse"/>`;
+  g += '<g transform="translate(0,-84) scale(1.1) translate(0,84)">';   // ხმლის ზომა; ქვაში ჩარჭობილი წერტილი უცვლელია
+  g += `<polygon points="-20,-332 0,-332 0,-80 -13,-80" fill="#eef3f9"/><polygon points="-20,-332 -13,-332 -9,-80 -13,-80" fill="#c9d6e6"/>` +
+    `<line x1="-4" y1="-322" x2="-3" y2="-92" stroke="#9fb4cf" stroke-width="2"/>`;
+  g += `<polygon points="0,-332 20,-332 13,-80 0,-80" fill="#2a2030"/><line x1="4" y1="-322" x2="3" y2="-92" stroke="#120c14" stroke-width="2"/>`;
+  const cracks = 'M2,-304 L9,-284 L5,-266 L11,-244 M3,-214 L8,-194 L4,-174 M2,-144 L9,-124 L6,-104';
+  g += `<path d="${cracks}" stroke="#ff3a1a" stroke-width="6" fill="none" opacity=".35"/><path d="${cracks}" stroke="#ff7a2a" stroke-width="2.2" fill="none"/>`;
+  // ოქროს გვირგვინი, დახრილად ჩამოკიდებული ჯვარედინის მარცხენა (სიკეთის) მკლავზე: უკანა ნაწილი მკლავის უკან, წინა — წინ
+  // ჩამოკიდების წერტილი მკლავზეა (-58,-342): გვირგვინის უკანა ნაპირი მკლავს ეყრდნობა, სხეული ქვემოთ ეკიდება და ოდნავ ქანაობს
+  const crownAt = inner => `<g transform="translate(-58,-342)"><g class="swing"><g transform="rotate(-22) scale(1.2) translate(0,23)">${inner}</g></g></g>`;
+  const yTop = cx => P(-16 + 7 * Math.sqrt(1 - (cx / 28) ** 2));
+  const tipList = [[-24, 16], [-18, 5], [-12, 20], [-6, 6], [0, 24], [6, 6], [12, 20], [18, 5], [24, 16]];
+  const tipPts = list => list.map(([tx, th]) => `${tx},${P(yTop(tx) - th)}`).join(' ');
+  g += crownAt(`<circle cx="0" cy="-14" r="44" fill="url(#${id}-glow)" opacity=".55"/><ellipse cx="0" cy="-16" rx="28" ry="7" fill="#8a5a1a"/>` +
+    `<polygon points="-16,-21 -12,-34 -8,-22" fill="#c8952e"/><polygon points="8,-22 12,-34 16,-21" fill="#c8952e"/>`);
+  const crownFront = crownAt(
+    `<polygon points="-28,${yTop(-28)} ${tipPts(tipList)} 28,${yTop(28)}" fill="#f2c44e"/>` +
+    `<polygon points="0,${yTop(0)} ${tipPts(tipList.filter(([tx]) => tx >= 0))} 28,${yTop(28)}" fill="#d9a23a" opacity=".55"/>` +
+    `<path d="M-28,0 A28,7 0 0 0 28,0 L28,-16 A28,7 0 0 1 -28,-16 Z" fill="#f2c44e"/><path d="M0,7 A28,7 0 0 0 28,0 L28,-16 A28,7 0 0 1 0,-9 Z" fill="#d9a23a" opacity=".55"/>` +
+    `<path d="M-28,-4 A28,7 0 0 0 28,-4" stroke="#b8862a" stroke-width="2" fill="none"/>` +
+    [[-24, 16], [-12, 20], [0, 24], [12, 20], [24, 16]].map(([tx, th]) => `<circle cx="${tx}" cy="${P(yTop(tx) - th - 2)}" r="3.2" fill="#ffe27a"/>`).join('') +
+    `<circle cx="0" cy="-2" r="5.5" fill="#e0302a"/><circle cx="-1.5" cy="-3.5" r="1.6" fill="#fff" opacity=".8"/>` +
+    `<circle cx="-16" cy="-3" r="3.6" fill="#4aa8ff"/><circle cx="16" cy="-3" r="3.6" fill="#4aa8ff"/>`);
+  g += `<path d="M0,-346 L-58,-350 Q-74,-352 -82,-368 Q-70,-356 -58,-334 L0,-330 Z" fill="#e8b84a"/><path d="M0,-339 L-60,-343" stroke="#fff3c0" stroke-width="2" opacity=".7"/>`;
+  g += `<path d="M0,-346 L58,-350 Q74,-352 84,-370 Q72,-356 58,-334 L0,-330 Z" fill="#1e1820"/>` +
+    `<polygon points="18,-347 24,-362 30,-348" fill="#1e1820"/><polygon points="40,-349 46,-364 52,-350" fill="#1e1820"/><path d="M0,-331 L58,-335" stroke="#ff4a2a" stroke-width="1.6" opacity=".8"/>`;
+  g += `<path d="M0,-348 A10,10 0 0 0 0,-328 Z" fill="#4aa8ff"/><path d="M0,-348 A10,10 0 0 1 0,-328 Z" fill="#ff3a2a"/>`;
+  g += crownFront + `<rect x="-7" y="-402" width="7" height="54" fill="#7a4a2a"/><rect x="0" y="-402" width="7" height="54" fill="#151018"/>`;
+  for (let gy = -396; gy < -350; gy += 9) g += `<line x1="-7" y1="${gy}" x2="0" y2="${gy + 4}" stroke="#e8b84a" stroke-width="1.6"/><line x1="0" y1="${gy + 4}" x2="7" y2="${gy}" stroke="#a02a1a" stroke-width="1.6"/>`;
+  g += `<path d="M0,-426 A13,13 0 0 0 0,-400 Z" fill="#e8b84a"/><path d="M0,-426 A13,13 0 0 1 0,-400 Z" fill="#1e1820"/><polygon points="6,-422 17,-434 12,-415" fill="#1e1820"/>` +
+    `<circle cx="-4" cy="-413" r="3.5" fill="#4aa8ff"/><circle cx="4" cy="-413" r="3.5" fill="#ff3a2a"/>`;
+  for (const [sx, sy, r] of [[-40, -380, 3], [-60, -300, 2.5], [-30, -230, 2], [-70, -350, 2]]) g += `<circle cx="${sx}" cy="${sy}" r="${r}" fill="#fff" class="flicker"/>`;
+  g += embers(20, 90, -380, -160, 8, 113) + '</g>';
+  // ქვა, რომელშიც ხმალია ჩარჭობილი
+  g += `<polygon points="-62,-18 -52,-70 -22,-88 26,-84 58,-64 64,-18" fill="${c.rock}"/><polygon points="26,-84 58,-64 64,-18 10,-18 4,-70" fill="${c.rockShade}"/>` +
+    `<polygon points="-52,-70 -22,-88 -10,-62 -40,-42" fill="${c.rockLight}" opacity=".6"/><path d="M-30,-60 L-20,-40 L-28,-24 M30,-70 L22,-50" stroke="${c.rockDark}" stroke-width="2" fill="none" opacity=".6"/>`;
+  g += pillar(20, 120) + pillar(160, 95, true);
+  return `<g transform="translate(${x},${y}) scale(${s})">${g}</g>`;
+}
+
+const EVIL = { stone: '#2c2230', shade: '#1a141e', rim: '#d0502a', rock: '#1c1418', win: '#ff6a2a' };
+
+const STONE = {
+  wall: '#dccdb0', shade: '#b5a484', wall2: '#e8dcc4', roof: '#a5513f', roofShade: '#84402f', slate: '#5d6c8c', slateShade: '#4a5672',
+  rock: '#8c8174', rockShade: '#6f655b', rockLight: '#a89d8f', rockDark: '#4f473f',
+  roof2: '#8f8a78', roofShade2: '#757060', dark: '#4a3a30', gold: '#e0ad3e', flag: '#d63a2f', ground: '#5f9d69'
+};
+
+// ---------- რელიეფი ----------
+function ridge(y, amp, seed, fill, n = 8) {
+  const r = rng(seed), pts = [];
+  for (let i = 0; i <= n; i++) pts.push([-200 + i * 2000 / n, y + (r() * 2 - 1) * amp]);
+  let d = `M-200,${H + 20} L${P(pts[0][0])},${P(pts[0][1])}`;
+  for (let i = 0; i < n; i++) {
+    const a = pts[i], b = pts[i + 1];
+    d += ` Q${P(a[0])},${P(a[1])} ${P((a[0] + b[0]) / 2)},${P((a[1] + b[1]) / 2)}`;
+  }
+  return `<path d="${d} L1800,${P(pts[n][1])} L1800,${H + 20} Z" fill="${fill}"/>`;
+}
+
+// კლდოვანი მწვერვალი ქედზე — ციხე მთის ნაწილად გამოიყურება და არა ზემოდან დადებულად
+function summit(h, cx, w, rise, fill, seed) {
+  const r = rng(seed), top = h.y(cx) - rise, f = [0, .3, .22, .55, .5, .82, 1];
+  const side = dir => f.map((t, i) => {
+    const x = cx + dir * w * (1 + i * .18);
+    return [P(x + (i ? (r() - .5) * 8 : 0)), P(top + (h.y(x) + 6 - top) * t + (i && i < f.length - 1 ? (r() - .5) * 6 : 0))];
+  });
+  const L = side(-1), R = side(1), str = a => a.map(p => p.join(',')).join(' '), end = p => `${p[0]},${P(p[1] + 40)}`;
+  let g = `<polygon points="${end(L[L.length - 1])} ${str([...L].reverse())} ${str(R)} ${end(R[R.length - 1])}" fill="${fill}"/>`;
+  g += `<polygon points="${P(cx + w * .3)},${P(top)} ${str(R)} ${end(R[R.length - 1])} ${P(cx + w * .2)},${P(top + rise + 40)}" fill="#1a1030" opacity=".3"/>`;
+  g += `<polygon points="${str([...L].reverse().slice(-4))} ${P(cx - w * .6)},${P(top + rise * .6)}" fill="#fff" opacity=".14"/>`;
+  g += `<path d="M${P(cx - w * .5)},${P(top + 4)} L${P(cx - w * .4)},${P(top + rise * .5)} L${P(cx - w * .55)},${P(top + rise)} M${P(cx + w * .6)},${P(top + 6)} L${P(cx + w * .7)},${P(top + rise * .6)} M${P(cx + w * 1.1)},${P(top + rise * .4)} L${P(cx + w * 1.05)},${P(top + rise)}" stroke="#1a1030" stroke-width="1.6" fill="none" opacity=".45"/>`;
+  return { svg: g, top: P(top) };
+}
+
+// ციხის ძირთან წინ დაყრილი ლოდები (და ბუჩქები ან ეკლები) — ციხის სწორ ძირს ფარავს
+function lip(cx, top, w, fills, seed, kind) {
+  const r = rng(seed); let g = '';
+  for (let x = cx - w * 1.1; x <= cx + w * 1.1; x += 9 + r() * 8) {
+    const bw = 7 + r() * 7, bh = 4 + r() * 6, by = top + 2 + r() * 3;
+    const pts = `${P(x - bw)},${P(by + 3)} ${P(x - bw * .6)},${P(by - bh)} ${P(x + bw * .3)},${P(by - bh - 2)} ${P(x + bw)},${P(by - 1)} ${P(x + bw * .8)},${P(by + 3)}`;
+    for (const f of fills) g += `<polygon points="${pts}" fill="${f}"/>`;
+    g += `<polygon points="${P(x + bw * .3)},${P(by - bh - 2)} ${P(x + bw)},${P(by - 1)} ${P(x + bw * .8)},${P(by + 3)} ${P(x + bw * .2)},${P(by + 3)}" fill="#1a1030" opacity=".3"/>`;
+    if (kind === 'good' && r() < .45) g += `<circle cx="${P(x)}" cy="${P(by - bh)}" r="${P(3 + r() * 3)}" fill="${r() < .5 ? '#4f8f62' : '#3f7d52'}"/>`;
+    if (kind === 'evil' && r() < .35) g += `<polygon points="${P(x - 2)},${P(by - bh)} ${P(x + 1)},${P(by - bh - 9)} ${P(x + 3)},${P(by - bh)}" fill="#140a10"/>`;
+  }
+  return g;
+}
+
+function mound(cx, y, w, h, fill) {
+  return `<path d="M${cx - w},${H + 800} L${cx - w},${y} C${cx - w * .5},${y} ${cx - w * .45},${y - h} ${cx},${y - h} C${cx + w * .45},${y - h} ${cx + w * .5},${y} ${cx + w},${y} L${cx + w},${H + 800} Z" fill="${fill}"/>`;
+}
+
+// ---------- ცა ----------
+function cloud(x, y, w, col, op) {
+  return `<g class="drift" opacity="${op}"><ellipse cx="${x}" cy="${y}" rx="${w}" ry="${P(w * .12)}" fill="${col}"/><ellipse cx="${P(x - w * .3)}" cy="${P(y - w * .06)}" rx="${P(w * .45)}" ry="${P(w * .1)}" fill="${col}"/><ellipse cx="${P(x + w * .35)}" cy="${P(y - w * .04)}" rx="${P(w * .35)}" ry="${P(w * .08)}" fill="${col}"/></g>`;
+}
+
+function birds(x, y, n, seed, col) {
+  const r = rng(seed); let g = '';
+  for (let i = 0; i < n; i++) {
+    const bx = x + r() * 220 - 110, by = y + r() * 90 - 45, s = .6 + r() * .6;
+    g += `<path d="M${P(bx)},${P(by)} q${P(6 * s)},${P(-6 * s)} ${P(12 * s)},0 q${P(6 * s)},${P(-6 * s)} ${P(12 * s)},0" stroke="${col}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+  }
+  return g;
+}
+
+// ---------- ბუნება ----------
+function tree(x, y, s, col, col2) {
+  return `<g transform="translate(${P(x)},${P(y)}) scale(${P(s)})">
+    <rect x="-3" y="-12" width="6" height="12" fill="#3b2a1e"/>
+    <polygon points="-22,-10 0,-48 22,-10" fill="${col}"/><polygon points="0,-48 22,-10 0,-10" fill="${col2}"/>
+    <polygon points="-18,-30 0,-66 18,-30" fill="${col}"/><polygon points="0,-66 18,-30 0,-30" fill="${col2}"/>
+    <polygon points="-13,-50 0,-84 13,-50" fill="${col}"/><polygon points="0,-84 13,-50 0,-50" fill="${col2}"/>
+  </g>`;
+}
+
+function forest(x0, x1, y0, y1, n, s0, s1, col, col2, seed, skip = []) {
+  const r = rng(seed), list = [];
+  for (let i = 0; i < n; i++) {
+    const x = x0 + r() * (x1 - x0), y = y0 + r() * (y1 - y0);
+    if (skip.some(([a, b]) => x > a && x < b)) continue;
+    list.push([x, y, s0 + (y - y0) / (y1 - y0 || 1) * (s1 - s0)]);
+  }
+  return list.sort((a, b) => a[1] - b[1]).map(([x, y, s]) => tree(x, y, s, col, col2)).join('');
+}
+
+function smoke(x, y, h, col, op, id) {
+  return `<path d="M${x - 10},${y} C${x - 34},${y - h * .4} ${x - 6},${y - h * .7} ${x - 80},${y - h} L${x + 70},${y - h} C${x + 30},${y - h * .6} ${x + 22},${y - h * .3} ${x + 10},${y} Z" fill="${col}" opacity="${op}" filter="url(#${id}-blur)"/>`;
+}
+
+// ---------- ჯარი ----------
+function soldier(x, y, s, c, kind, mirror, torch, id) {
+  if (c.race) return creature(x, y, s, c, kind, mirror, torch, id);
+  let g = `<g transform="translate(${P(x)},${P(y)}) scale(${P(mirror ? -s : s)},${P(s)})">`;
+  if (torch) g += `<circle cx="-12" cy="-62" r="28" fill="url(#${id}-glow)" class="flicker"/>`;
+  g += `<rect x="-5" y="-15" width="4" height="15" fill="${c.dark}"/><rect x="1" y="-15" width="4" height="15" fill="${c.dark}"/>`;
+  g += `<path d="M-8.5,-13 L-6.5,-32 L6.5,-32 L8.5,-13 Z" fill="${c.body}"/><path d="M0,-32 L6.5,-32 L8.5,-13 L0,-13 Z" fill="#000" opacity=".18"/>`;
+  g += `<rect x="-7.5" y="-21" width="15" height="2.6" fill="${c.trim}"/>`;
+  g += `<circle cx="0" cy="-37" r="5.2" fill="${c.skin}"/><path d="M-5.8,-37 A5.8,5.8 0 0 1 5.8,-37 L5.8,-36 L-5.8,-36 Z" fill="${c.metal}"/>`;
+  if (c.plume) g += `<path d="M0,-43 Q5,-50 -2,-54" stroke="${c.plume}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+  if (kind === 'spear') g += `<line x1="9.5" y1="-60" x2="9.5" y2="1" stroke="${c.wood}" stroke-width="1.8"/><polygon points="9.5,-68 12,-59 7,-59" fill="${c.metal}"/>`;
+  else if (kind === 'shield') g += `<line x1="9.5" y1="-52" x2="9.5" y2="1" stroke="${c.wood}" stroke-width="1.8"/><polygon points="9.5,-59 12,-51 7,-51" fill="${c.metal}"/><circle cx="-8" cy="-22" r="8.5" fill="${c.trim}"/><circle cx="-8" cy="-22" r="5.6" fill="${c.body}"/><circle cx="-8" cy="-22" r="1.8" fill="${c.trim}"/>`;
+  else if (kind === 'bow') g += `<path d="M8,-48 Q19,-30 8,-10" stroke="${c.wood}" stroke-width="2" fill="none"/><line x1="8" y1="-48" x2="8" y2="-10" stroke="${c.trim}" stroke-width=".7"/>`;
+  else if (kind === 'sword') g += `<line x1="9" y1="-18" x2="16" y2="-48" stroke="${c.metal}" stroke-width="2.4"/><line x1="5" y1="-22" x2="13" y2="-20" stroke="${c.trim}" stroke-width="2"/>`;
+  if (torch) g += `<line x1="-9" y1="-24" x2="-12" y2="-56" stroke="${c.wood}" stroke-width="2"/><path d="M-15.5,-55 Q-15.5,-64 -12,-71 Q-8.5,-64 -8.5,-55 Z" fill="#ffb347" class="flicker"/>`;
+  return g + '</g>';
+}
+
+// ელფები, ჯუჯები და ორკები — თითოეულს თავისი სილუეტი და იარაღი აქვს
+function creature(x, y, s, c, kind, mirror, torch, id) {
+  let g = `<g transform="translate(${P(x)},${P(y)}) scale(${P(mirror ? -s : s)},${P(s)})">`;
+  if (c.race === 'elf') {          // მაღალი და წვრილი, გრძელი თმა, წვეტიანი ყურები, მოსასხამი
+    g += `<path d="M-7,-36 L-11,-5 L11,-5 L7,-36 Z" fill="${c.cloak}"/>`;
+    g += `<rect x="-4.5" y="-17" width="3.6" height="17" fill="${c.dark}"/><rect x=".9" y="-17" width="3.6" height="17" fill="${c.dark}"/>`;
+    g += `<path d="M-7,-15 L-5.5,-36 L5.5,-36 L7,-15 Z" fill="${c.body}"/><path d="M0,-36 L5.5,-36 L7,-15 L0,-15 Z" fill="#000" opacity=".15"/>`;
+    g += `<rect x="-6.5" y="-24" width="13" height="2.2" fill="${c.trim}"/>`;
+    g += `<path d="M-5.6,-43 Q0,-49 5.6,-43 L6.4,-30 L3.6,-33 L-3.6,-33 L-6.4,-30 Z" fill="${c.hair}"/>`;
+    g += `<circle cx="0" cy="-41" r="4.7" fill="${c.skin}"/><polygon points="-4.4,-42 -8.6,-45.5 -4.2,-39.4" fill="${c.skin}"/><polygon points="4.4,-42 8.6,-45.5 4.2,-39.4" fill="${c.skin}"/>`;
+    g += `<path d="M-5,-42 Q0,-48.5 5,-42 Q0,-44.5 -5,-42 Z" fill="${c.hair}"/>`;
+    if (kind === 'shield') g += `<line x1="9.5" y1="-72" x2="9.5" y2="1" stroke="${c.wood}" stroke-width="1.6"/><path d="M9.5,-82 Q12.5,-76 9.5,-70 Q6.5,-76 9.5,-82 Z" fill="${c.metal}"/>`;   // ფოთლისებრი შუბი
+    else g += `<path d="M8,-60 Q21,-34 8,-6" stroke="${c.wood}" stroke-width="2" fill="none"/><line x1="8" y1="-60" x2="8" y2="-6" stroke="${c.trim}" stroke-width=".7"/>`;   // გრძელი მშვილდი
+  } else if (c.race === 'dwarf') { // დაბალი და განიერი, დიდი წვერი, რქიანი ჩაფხუტი
+    g += `<rect x="-6" y="-9" width="5" height="9" fill="${c.dark}"/><rect x="1" y="-9" width="5" height="9" fill="${c.dark}"/>`;
+    g += `<path d="M-10.5,-8 L-9.5,-26 L9.5,-26 L10.5,-8 Z" fill="${c.body}"/><path d="M0,-26 L9.5,-26 L10.5,-8 L0,-8 Z" fill="#000" opacity=".15"/>`;
+    g += `<rect x="-10" y="-14" width="20" height="3" fill="${c.trim}"/><rect x="-2" y="-14.5" width="4" height="4" fill="${c.metal}"/>`;
+    g += `<circle cx="0" cy="-30" r="5" fill="${c.skin}"/>`;
+    g += `<path d="M-5.6,-29 Q-7.5,-16 0,-11 Q7.5,-16 5.6,-29 Q0,-26.5 -5.6,-29 Z" fill="${c.beard}"/>`;
+    g += `<path d="M-6,-31 A6,6 0 0 1 6,-31 Z" fill="${c.metal}"/><path d="M-5.5,-33 Q-11,-36 -10,-42 Q-8,-36 -4,-35 Z M5.5,-33 Q11,-36 10,-42 Q8,-36 4,-35 Z" fill="#ece4d0"/>`;
+    g += `<line x1="9" y1="-36" x2="9" y2="0" stroke="${c.wood}" stroke-width="2.2"/>`;
+    g += kind === 'shield' ? `<rect x="4" y="-40" width="10" height="7" rx="1" fill="${c.metal}"/>`               // ურო
+                           : `<path d="M9,-36 Q18,-38 18,-27 Q13,-29 9,-28 Z" fill="${c.metal}"/>`;         // ცული
+  } else if (c.race === 'orc') {   // მოხრილი, განიერმხრებიანი, მწვანე კანი, ეშვები, წითელი თვალები
+    if (torch) g += `<circle cx="-12" cy="-60" r="28" fill="url(#${id}-glow)" class="flicker"/>`;
+    g += `<rect x="-6.5" y="-14" width="5.2" height="14" fill="${c.dark}"/><rect x="1.3" y="-14" width="5.2" height="14" fill="${c.dark}"/>`;
+    g += `<path d="M-10,-12 L-9.5,-31 L9.5,-31 L10,-12 Z" fill="${c.body}"/><path d="M0,-31 L9.5,-31 L10,-12 L0,-12 Z" fill="#000" opacity=".2"/>`;
+    g += `<polygon points="-12.5,-29 -10,-37 -5,-31" fill="${c.metal}"/><polygon points="12.5,-29 10,-37 5,-31" fill="${c.metal}"/>`;
+    g += `<rect x="-9.5" y="-20" width="19" height="2.6" fill="${c.trim}"/>`;
+    g += `<circle cx="0" cy="-35" r="5.6" fill="${c.skin}"/><rect x="-4.2" y="-33" width="8.4" height="3.4" rx="1" fill="${c.skin}"/>`;
+    g += `<polygon points="-3.2,-31 -2.6,-35.5 -1.6,-31" fill="#f0ead8"/><polygon points="3.2,-31 2.6,-35.5 1.6,-31" fill="#f0ead8"/>`;
+    g += `<circle cx="-2" cy="-37" r=".95" fill="#ff4a2a"/><circle cx="2" cy="-37" r=".95" fill="#ff4a2a"/>`;
+    g += `<path d="M-6.2,-37.5 L-4.5,-44 L-1.8,-39.5 L0,-46.5 L1.8,-39.5 L4.5,-44 L6.2,-37.5 Z" fill="${c.metal}"/>`;
+    if (kind === 'shield') g += `<line x1="9" y1="-14" x2="13" y2="-40" stroke="${c.wood}" stroke-width="2"/><polygon points="11,-40 20,-45 19,-31 13.5,-33" fill="${c.blade}"/>` +
+      `<circle cx="-8.5" cy="-21" r="8.5" fill="${c.trim}"/><circle cx="-8.5" cy="-21" r="6" fill="#1a1216"/><path d="M-11,-24 L-6,-21 L-11,-18" stroke="${c.trim}" stroke-width="1.6" fill="none"/>`;   // საჭრელი და ფარი
+    else g += `<line x1="9.5" y1="-58" x2="9.5" y2="1" stroke="${c.wood}" stroke-width="2"/><polygon points="9.5,-68 13,-58 9.5,-55 6,-58" fill="${c.blade}"/><polygon points="9.5,-58 13.5,-61 11,-56" fill="${c.blade}"/>`;   // უხეში შუბი
+    if (torch) g += `<line x1="-9" y1="-24" x2="-12" y2="-54" stroke="${c.wood}" stroke-width="2"/><path d="M-15.5,-53 Q-15.5,-62 -12,-69 Q-8.5,-62 -8.5,-53 Z" fill="#ffb347" class="flicker"/>`;
+  }
+  return g + '</g>';
+}
+
+// გოლიათი (ტროლი): ორკზე ორჯერ მაღალი, ეკლიანი კეტი მხარზე
+function giant(x, y, s, c, id) {
+  let g = `<g transform="translate(${P(x)},${P(y)}) scale(${P(s)})">`;
+  g += `<rect x="-13" y="-36" width="11" height="36" fill="${c.skinDark}"/><rect x="2" y="-36" width="11" height="36" fill="${c.skinDark}"/>`;
+  g += `<polygon points="-15,-38 15,-38 11,-20 -11,-20" fill="${c.cloth}"/>`;
+  g += `<path d="M-17,-36 Q-22,-66 -11,-80 L11,-80 Q22,-66 17,-36 Z" fill="${c.skin}"/><path d="M0,-80 L11,-80 Q22,-66 17,-36 L0,-36 Z" fill="#000" opacity=".18"/>`;
+  g += `<path d="M-6,-60 Q0,-54 6,-60" stroke="${c.skinDark}" stroke-width="2" fill="none" opacity=".6"/>`;
+  g += `<path d="M-16,-76 Q-27,-58 -22,-34 L-15,-34 Q-19,-56 -9,-72 Z" fill="${c.skin}"/>`;                    // ჩამოშვებული ხელი
+  g += `<path d="M12,-72 Q24,-80 22,-96 L16,-96 Q16,-82 8,-76 Z" fill="${c.skin}"/>`;                          // აწეული ხელი
+  g += `<line x1="18" y1="-90" x2="-2" y2="-128" stroke="${c.wood}" stroke-width="7" stroke-linecap="round"/><circle cx="-4" cy="-131" r="10" fill="${c.wood}"/>`;
+  for (const [sx, sy] of [[-14, -134], [-8, -142], [3, -138], [-2, -122], [6, -129]]) g += `<polygon points="${sx - 2},${sy + 2} ${sx},${sy - 5} ${sx + 2},${sy + 2}" fill="${c.metal}"/>`;
+  g += `<circle cx="0" cy="-86" r="8" fill="${c.skin}"/><rect x="-7" y="-91" width="14" height="3" fill="${c.skinDark}"/>`;
+  g += `<circle cx="-3" cy="-87" r="1.3" fill="#ff4a2a"/><circle cx="3" cy="-87" r="1.3" fill="#ff4a2a"/>`;
+  g += `<polygon points="-4,-81 -3.2,-86 -2.2,-81" fill="#f0ead8"/><polygon points="4,-81 3.2,-86 2.2,-81" fill="#f0ead8"/>`;
+  return g + '</g>';
+}
+
+function banner(x, y, h, col, em, shape, sc = 1) {
+  const fw = 46 * sc, fh = 32 * sc, top = y - h, fx = x + 1.5 * sc;
+  const cx = fx + fw / 2, cy = top + fh / 2, r = 7 * sc, sw = P(2.6 * sc);
+  let e = '';
+  if (shape === 'circle') e = `<circle cx="${P(cx)}" cy="${P(cy)}" r="${P(r)}" fill="${em}"/>`;
+  else if (shape === 'ring') e = `<circle cx="${P(cx)}" cy="${P(cy)}" r="${P(r)}" fill="none" stroke="${em}" stroke-width="${sw}"/><circle cx="${P(cx)}" cy="${P(cy)}" r="${P(r * .35)}" fill="${em}"/>`;
+  else if (shape === 'tri') e = `<polygon points="${P(cx)},${P(cy - r)} ${P(cx + r)},${P(cy + r * .8)} ${P(cx - r)},${P(cy + r * .8)}" fill="none" stroke="${em}" stroke-width="${sw}"/>`;
+  else if (shape === 'chev') e = `<polyline points="${P(cx - r)},${P(cy + r * .5)} ${P(cx)},${P(cy - r * .5)} ${P(cx + r)},${P(cy + r * .5)}" fill="none" stroke="${em}" stroke-width="${P(3 * sc)}"/>`;
+  else if (shape === 'diamond') e = `<polygon points="${P(cx)},${P(cy - r)} ${P(cx + r * .7)},${P(cy)} ${P(cx)},${P(cy + r)} ${P(cx - r * .7)},${P(cy)}" fill="${em}"/>`;
+  else if (shape === 'cross') e = `<rect x="${P(cx - r * .3)}" y="${P(top + 3 * sc)}" width="${P(r * .6)}" height="${P(fh - 6 * sc)}" fill="${em}"/><rect x="${P(fx + 4 * sc)}" y="${P(cy - r * .3)}" width="${P(fw - 8 * sc)}" height="${P(r * .6)}" fill="${em}"/>`;
+  else if (shape === 'geo') { // ხუთჯვრიანი დროშა
+    const t = fh * .17;
+    e = `<rect x="${P(cx - t / 2)}" y="${P(top)}" width="${P(t)}" height="${P(fh)}" fill="${em}"/><rect x="${P(fx)}" y="${P(cy - t / 2)}" width="${P(fw)}" height="${P(t)}" fill="${em}"/>`;
+    for (const [dx, dy] of [[-.25, -.25], [.25, -.25], [-.25, .25], [.25, .25]]) {
+      const qx = cx + dx * fw, qy = cy + dy * fh, q = fh * .1;
+      e += `<rect x="${P(qx - q * .3)}" y="${P(qy - q)}" width="${P(q * .6)}" height="${P(q * 2)}" fill="${em}"/><rect x="${P(qx - q)}" y="${P(qy - q * .3)}" width="${P(q * 2)}" height="${P(q * .6)}" fill="${em}"/>`;
+    }
+  }
+  return `<line x1="${P(x)}" y1="${P(y)}" x2="${P(x)}" y2="${P(top - 6 * sc)}" stroke="#23170f" stroke-width="${P(3 * sc)}" stroke-linecap="round"/>` +
+    `<circle cx="${P(x)}" cy="${P(top - 7 * sc)}" r="${P(3.2 * sc)}" fill="#d8a640"/>` +
+    `<g class="flag" style="animation-delay:-${(Math.random() * 2).toFixed(2)}s"><rect x="${P(fx)}" y="${P(top)}" width="${P(fw)}" height="${P(fh)}" fill="${col}"/>${e}</g>`;
+}
+
+// ბეზიეს მრუდი — გზისთვის და მიმავალი ჯარისთვის
+const bez = (p, t) => { const u = 1 - t; return [0, 1].map(i => u * u * u * p[0][i] + 3 * u * u * t * p[1][i] + 3 * u * t * t * p[2][i] + t * t * t * p[3][i]); };
+
+const normal = (p, t) => { const a = bez(p, Math.max(0, t - .01)), b = bez(p, Math.min(1, t + .01)); const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1; return [-dy / l, dx / l]; };
+
+// t0..t1 — მრუდის რომელი ნაწილი დაიხატოს (ნაგულისხმევად მთლიანი).
+// w0 შეიძლება იყოს ფუნქციაც: სიგანე სიღრმის (y) მიხედვით — ახლოს ფართო, შორს ვიწრო
+function road(p, w0, w1, fill, t0 = 0, t1 = 1) {
+  const L = [], R = [];
+  for (let i = 0; i <= 40; i++) {
+    const t = t0 + (t1 - t0) * i / 40, [x, y] = bez(p, t), [nx, ny] = normal(p, t);
+    const w = (typeof w0 === 'function' ? w0(y) : w0 + (w1 - w0) * t) / 2;
+    L.push(`${P(x + nx * w)},${P(y + ny * w)}`); R.push(`${P(x - nx * w)},${P(y - ny * w)}`);
+  }
+  return `<path d="M${L.join(' L')} L${R.reverse().join(' L')} Z" fill="${fill}"/>`;
+}
+
+// ჯარის კოლონა გზაზე: კარიბჭესთან პატარა (შორს), ქვემოთ დიდი (მაყურებელთან ახლოს)
+function marchColumn(p, colors, id, seed, o) {
+  const r = rng(seed), scale = t => o.s0 * Math.pow(o.s1 / o.s0, Math.pow(t / o.tMax, 1.4)), ranks = [];
+  const t0 = o.tMin || .02;
+  let g = '', last = bez(p, t0), dist = Infinity;
+  for (let t = t0; t <= o.tMax; t += .002) {
+    const pt = bez(p, t);
+    dist += Math.hypot(pt[0] - last[0], pt[1] - last[1]); last = pt;
+    if (dist >= 20 * scale(t)) { ranks.push(t); dist = 0; }
+  }
+  let i = 0;
+  for (const t of ranks.reverse()) {
+    const [x, y] = bez(p, t), [nx, ny] = normal(p, t), s = scale(t), off = 17 * s;
+    i++;
+    if (o.giant && i % o.giant === 3) g += giant(x, y, s, o.giantC || GIANT, id);     // ზოგ რიგში — გოლიათი
+    else for (const side of [-1, 0, 1]) {
+      const c = colors[Math.floor(r() * colors.length)];
+      g += soldier(x + nx * off * side, y + ny * off * side, s, c, r() < .7 ? 'spear' : 'shield', false, o.torch && r() < o.torch, id);
+    }
+    if (i % 6 === 4) g += banner(x + 22 * s, y, 74 * s, o.flag[0], o.flag[1], o.flag[2], s * .75);
+  }
+  return g;
+}
+
+// ---------- ფერები ----------
+const SK = '#d9a77c', MET = '#b4bcc6', WD = '#5a3d26';
+
+const C = (body, trim, o = {}) => ({ body, trim, skin: SK, metal: MET, dark: '#1d1520', wood: WD, ...o });
+
+// სიკეთის ჯარი: ადამიანები, ელფები და ჯუჯები
+const GOOD_ARMY = [
+  C('#2f5fb8', '#e8d48a'), C('#24468a', '#cfd8e6', { plume: '#7fb2ff' }),
+  { race: 'elf', body: '#2f7a52', cloak: '#1f5a3c', trim: '#d8e0e8', hair: '#f0d890', skin: '#f0d2b4', metal: '#dfe6ee', dark: '#1d2a24', wood: '#6a4a2a' },
+  { race: 'elf', body: '#3a8a8a', cloak: '#25606a', trim: '#e8d48a', hair: '#e8e8f0', skin: '#f0d2b4', metal: '#dfe6ee', dark: '#1d2a2a', wood: '#6a4a2a' },
+  { race: 'dwarf', body: '#8a3a2a', trim: '#d8a640', beard: '#a0602a', skin: '#e0a880', metal: MET, dark: '#2a1c18', wood: WD },
+  { race: 'dwarf', body: '#2f4f8a', trim: '#d8a640', beard: '#c8c0b0', skin: '#e0a880', metal: MET, dark: '#2a1c18', wood: WD }
+];
+// ბოროტების ჯარი: ორკები (და გოლიათები — იხ. GIANT)
+const EVIL_ARMY = [
+  { race: 'orc', body: '#2a2228', trim: '#b8322a', skin: '#5f7a3e', metal: '#4a4450', blade: '#8a8f96', dark: '#120c10', wood: '#2a1a14' },
+  { race: 'orc', body: '#3a2a22', trim: '#e0602a', skin: '#6b8442', metal: '#3a3440', blade: '#7a7f86', dark: '#140e0c', wood: '#2a1a14' },
+  { race: 'orc', body: '#1e1a22', trim: '#b8322a', skin: '#4f6a3a', metal: '#4a4450', blade: '#8a8f96', dark: '#0e0a0c', wood: '#2a1a14' }
+];
+const GIANT = { skin: '#6b7a5a', skinDark: '#4f5c42', cloth: '#4a3428', wood: '#4a3020', metal: '#9a9ea6' };
+const hazeAll = (list, to, t) => list.map(c => hazed(c, to, t));
+
+/* =========================================================
+   სცენა
+   ========================================================= */
+// სიკეთისა და ბოროტების საზღვარი — ზუსტად ხმალზე (მარცხნივ სიკეთე, მარჯვნივ ბოროტება)
+// ფერების ორი ნაკრები: vivid — ნათელი, გაჯერებული (ავტორის ნიმუშის მიხედვით), soft — წინა, რბილი.
+// ძველის სანახავად გახსენი გვერდი ბოლოში ?soft-ით (მაგ. landing-backgrounds.html?soft)
+const PALETTES = {
+  vivid: {
+    sky: 'linear-gradient(180deg,#191c66 0%,#3d2c94 20%,#8e3fa6 38%,#e8607a 52%,#ff8c42 64%,#ffbe55 76%,#ffd978 100%)',
+    sun: '#fff4b8', cloud: '#ff9f86', cloud2: '#ffb98e', fog: '#ffd2b8',
+    back: '#8a7fdc', backHaze: '#c7b8f2', mid: '#5d6fd0', midHaze: '#a5b0ee',
+    g1: '#55c25a', g2: '#3fa84a', forest: '#2e9a4c', forestShade: '#22803c', tree: '#1f8040', treeShade: '#15612c',
+    road: '#f0cf8e', farRoad: '#e8d2a6', birds: '#3a2a6a'
+  },
+  soft: {
+    sky: 'linear-gradient(180deg,#34437f 0%,#7a6aa6 26%,#e8998a 50%,#ffcf98 68%,#ffe2b0 100%)',
+    sun: '#fff0c4', cloud: '#ffd6c4', cloud2: '#ffd6c4', fog: '#fff3e6',
+    back: '#b8afd8', backHaze: '#d9cde6', mid: '#98a6cd', midHaze: '#bcc6de',
+    g1: '#7db285', g2: '#6aa77a', forest: '#4f8f62', forestShade: '#417a52', tree: '#2a6340', treeShade: '#1f4f33',
+    road: '#e2c592', farRoad: '#d8c8a8', birds: '#5a4a6a'
+  }
+};
+const THEME = PALETTES[/[?&]soft\b/.test(location.search) ? 'soft' : 'vivid'];
+
+const SPLIT = 1010;
+const FORK_Y = 852;   // სად იყოფა ფართო გზა ორად
+
+function drawScene(id) {
+  let s = defs(id);
+  // ხეობის ფერები: მარცხნივ — დილის; მარჯვნივ — დამწვარი, ბნელი
+  const lg = (gid, a, b, x0, x1) => `<linearGradient id="${id}-${gid}" gradientUnits="userSpaceOnUse" x1="${x0}" y1="0" x2="${x1}" y2="0"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`;
+  // მიწის ყველა ფენა ერთ ადგილას და რბილად გადადის: მწვანე → ზეთისხილისფერი → დამწვარი ყავისფერი → მუქი
+  // (ერთნაირი დიაპაზონი, რომ ფენების კიდეები გადასვლის ზოლში არ გამოჩნდეს)
+  const BURN_X = [SPLIT - 70, SPLIT + 70];   // გადასვლა სიმეტრიულია ხმლის (ცენტრის) გარშემო
+  const burn = (gid, green, dark) => `<linearGradient id="${id}-${gid}" gradientUnits="userSpaceOnUse" x1="${BURN_X[0]}" y1="0" x2="${BURN_X[1]}" y2="0">` +
+    `<stop offset="0" stop-color="${green}"/><stop offset=".42" stop-color="${mix(green, '#8a8a4a', .55)}"/>` +
+    `<stop offset=".58" stop-color="${mix(dark, '#6a4a32', .55)}"/><stop offset="1" stop-color="${dark}"/></linearGradient>`;
+  s += `<defs>${lg('back', THEME.back, '#3a2838', SPLIT - 90, SPLIT + 110)}${lg('mid', THEME.mid, '#2a1c28', SPLIT - 90, SPLIT + 110)}${burn('g1', THEME.g1, '#2e1e22')}${burn('g2', THEME.g2, '#261a1c')}
+    <linearGradient id="${id}-night" gradientUnits="userSpaceOnUse" x1="${SPLIT + 420}" y1="0" x2="${SPLIT - 30}" y2="0"><stop offset="0" stop-color="#12050e" stop-opacity=".8"/><stop offset=".55" stop-color="#12050e" stop-opacity=".5"/><stop offset="1" stop-color="#12050e" stop-opacity="0"/></linearGradient></defs>`;
+
+  // მზე — მარცხნივ, სიკეთის ციხის უკან
+  s += `<circle cx="690" cy="470" r="400" fill="url(#${id}-sunglow)"/><circle cx="690" cy="470" r="62" fill="${THEME.sun}"/>`;
+  s += cloud(420, 230, 260, THEME.cloud, .45) + cloud(860, 300, 200, THEME.cloud2, .35) + cloud(1300, 260, 280, '#3a2430', .7);
+  s += birds(520, 300, 6, 19, THEME.birds);
+
+  // ვულკანი ბოროტების მხარეს
+  s += smoke(1480, 345, 330, '#1a1014', .75, id) + volcano(1480, 640, 280, 340, id);
+
+  // ციხე ქედის თხემზე, ქვეშ პატარა ჩრდილით (როგორც ანძა შენს ნიმუშზე)
+  const onRidge = (h, cx, sc, haze, fill, type) =>
+    `<ellipse cx="${cx}" cy="${P(h.y(cx) + 3)}" rx="${P(300 * sc)}" ry="${P(Math.max(2, 14 * sc))}" fill="#2a2350" opacity=".18"/>` +
+    fortress(cx, P(h.y(cx) + 2), sc, { ...hazed(STONE, haze, Math.max(.15, .3 + (.2 - sc) * 2.2)), ground: fill, type, id });
+
+  // უკანა ქედი — ყველაზე შორს: პატარა და მკრთალი ციხეები
+  const back = hills(560, [[420, 60, 240], [820, 90, 210], [1180, 70, 200], [1560, 78, 220]], 6, 95, `url(#${id}-back)`);
+  s += back.svg;
+  s += onRidge(back, 420, .065, THEME.backHaze, THEME.back, 'round') + onRidge(back, 820, .085, THEME.backHaze, THEME.back, 'keep');
+  // შორეული ციხიდან გამომავალი ჯარი — ფერდობზე ზიგზაგით ჩამოდის და შუა ქედის უკან იმალება
+  const farGood = [[795, 610], [860, 560], [765, 512], [820, P(back.y(820) + 2)]];
+  s += road(farGood, 9, 3, THEME.farRoad);
+  s += marchColumn(farGood, hazeAll(GOOD_ARMY, '#c9c3e0', .35), id, 85,
+    { s0: .17, s1: .07, tMax: .97, flag: ['#5a7cc0', '#f2e6d0', 'ring'] });
+  const farRound = [[400, 615], [462, 572], [378, 532], [420, P(back.y(420) + 2)]];
+  s += road(farRound, 8, 3, THEME.farRoad);
+  s += marchColumn(farRound, hazeAll(GOOD_ARMY, '#c9c3e0', .4), id, 89,
+    { s0: .15, s1: .06, tMax: .97, flag: ['#5a7cc0', '#f2e6d0', 'ring'] });
+  s += fog(470, 130, .9, id);
+
+  // შუა ქედი — სიკეთის ციხე მარცხნივ, ბნელი ციტადელი მარჯვნივ
+  const mid = hills(628, [[250, 60, 220], [690, 85, 190], [1340, 90, 200]], 5, 96, `url(#${id}-mid)`);
+  s += mid.svg;
+  // შუა ციხეები კლდოვან მწვერვალებზე დგას — მთის ნაწილია
+  const midFill = `url(#${id}-mid)`;
+  const gSum = summit(mid, 690, 72, 30, midFill, 121);
+  s += gSum.svg;
+  s += fortress(690, gSum.top + 3, .22, { ...hazed(STONE, THEME.midHaze, .25), ground: THEME.mid, type: 'georgian', id }) + lip(690, gSum.top + 3, 72, [midFill], 122, 'good');
+  // შორეული ბილიკი ციხიდან: ზიგზაგით ჩამოდის და წინა ბორცვის უკან იმალება (ბორცვის ამ მხარეს ახლო გზა გრძელდება)
+  const farG = [[770, 660], [630, 612], [775, 562], [681, gSum.top + 3]];
+  s += road(farG, 18, 5, THEME.farRoad) + marchColumn(farG, hazeAll(GOOD_ARMY, '#bcc6de', .2), id, 91,
+    { s0: .32, s1: .13, tMax: .97, flag: ['#2f62b8', '#f2d27a', 'ring'] });
+  s += fog(545, 110, .7, id);
+
+  // ბოროტების მხარე: ღამე და წითელი ნათება ჰორიზონტზე
+  s += `<rect x="-200" y="-1400" width="2000" height="3200" fill="url(#${id}-night)"/>`;
+  // ვარსკვლავები — მხოლოდ ბოროტების (ღამის) ნახევარში, ხმლის მარჯვნივ
+  const sr = rng(105);
+  for (let k = 0; k < 90; k++)
+    s += `<circle class="twinkle" cx="${P(SPLIT + 30 + sr() * 700)}" cy="${P(-1000 + sr() * 1300)}" r="${P(.7 + sr() * 1.1)}" fill="#fff" style="animation-delay:-${(sr() * 3).toFixed(2)}s"/>`;
+  s += `<ellipse cx="1320" cy="620" rx="400" ry="230" fill="url(#${id}-evilglow)" opacity=".5"/>`;
+  s += smoke(1180, 490, 240, '#140c10', .55, id) + smoke(1340, 540, 300, '#140c10', .4, id);
+  s += `<ellipse cx="1180" cy="${P(back.y(1180) + 3)}" rx="36" ry="2" fill="#000" opacity=".3"/>` +
+    obsidianZiggurat(1180, P(back.y(1180) + 4), .15, { ...hazed(EVIL, '#5a4458', .3), id });
+  // შორეული ციტადელიდან გამომავალი ლაშქარი — ჩანს მხოლოდ შუა ქედის ზემოთ
+  let above = '960,0';
+  for (let x = 960; x <= 1420; x += 10) above += ` ${x},${P(mid.y(x))}`;
+  s += `<defs><clipPath id="${id}-farEvil"><polygon points="${above} 1420,0"/></clipPath></defs>`;
+  const farEvil = [[1215, 615], [1125, 572], [1235, 524], [1180, P(back.y(1180) + 4)]];
+  const farOrcs = hazeAll(EVIL_ARMY, '#5a4458', .3), farGiant = hazed(GIANT, '#5a4458', .3);
+  s += `<g clip-path="url(#${id}-farEvil)">${road(farEvil, 9, 3, '#4a3438')}` +
+    marchColumn(farEvil, farOrcs, id, 87,
+      { s0: .19, s1: .08, tMax: .97, torch: .15, giant: 7, giantC: farGiant, flag: ['#1a1418', '#e0402a', 'tri'] }) + '</g>';
+  // ბნელი ციტადელი შავ კლდოვან მწვერვალზე, რომელიც ქვემოთ ქედში გადადის
+  s += `<defs><linearGradient id="${id}-crag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c1218"/><stop offset=".55" stop-color="#1c1218" stop-opacity=".9"/><stop offset="1" stop-color="#1c1218" stop-opacity="0"/></linearGradient></defs>`;
+  const eSum = summit(mid, 1340, 80, 36, `url(#${id}-crag)`, 123);
+  s += eSum.svg + darkCitadel(1340, eSum.top + 4, .3, { ...EVIL, id }) + lip(1340, eSum.top + 3, 80, ['#1c1218'], 124, 'evil');
+  const farE = [[1250, 665], [1400, 612], [1255, 565], [1340, eSum.top + 3]];
+  s += road(farE, 18, 5, '#3a2a2c') + marchColumn(farE, farOrcs, id, 93,
+    { s0: .32, s1: .14, tMax: .97, torch: .15, giant: 6, giantC: farGiant, flag: ['#1a1418', '#e0402a', 'tri'] });
+
+  // ბორცვები: მარცხნივ — მწვანე ტყე, მარჯვნივ — ეკლიანი კლდეები და დამწვარი ხეები
+  s += `<g transform="translate(1600,0) scale(-1,1)">${crags(-200, 1600 - SPLIT - 60, 655, 70, 101, '#1e141a')}</g>`;
+  // წინა ბორცვი — ორი თხემით, რომლებზეც ახლო გზები გადადის
+  const near = hills(640, [[760, 26, 150], [1260, 26, 150]], 4, 91, `url(#${id}-g1)`);
+  s += near.svg;
+  s += forest(-50, 1180, 628, 662, 60, .32, .46, THEME.forest, THEME.forestShade, 97, [[715, 805], [800, 1220]]);
+  s += deadForest(SPLIT + 70, 1660, 630, 664, 26, .3, .45, 103);
+  s += ridge(672, 12, 93, `url(#${id}-g2)`);
+  s += `<rect x="-200" y="890" width="2000" height="800" fill="url(#${id}-g2)"/>`;   // მიწის გაგრძელება ქვემოთ (ტელეფონზე ჩანს)
+  s += ruin(1250, 698, .8, id) + ruin(1440, 690, .75, id) + ruin(1645, 700, .85, id);
+
+  // ცენტრში — ხმალი ქვაში, გვირგვინით
+  s += mound(1010, 712, 360, 100, `url(#${id}-g2)`);   // იგივე ფერი, რაც მიწას — გადასვლის ზოლში კიდე არ ჩანს
+  s += swordInStone(1010, 640, .6, STONE, id);
+
+  // ლავის მდინარე: ბორცვს მიღმიდან გამოედინება — ზემოთ ვიწროა და ბორცვის ხაზთან იმალება, ქვემოთ ფართოვდება
+  const lavaP = [[1488, 598], [1515, 700], [1585, 790], [1705, 950]];
+  let lavaEdge = '';
+  for (let x = -200; x <= 1800; x += 10) lavaEdge += ` ${x},${P(near.y(x))}`;
+  s += `<defs><clipPath id="${id}-lavaClip"><polygon points="-200,${H + 800}${lavaEdge} 1800,${H + 800}"/></clipPath></defs>`;
+  s += `<g clip-path="url(#${id}-lavaClip)">`;
+  const lavaW = y => Math.max(3, 200 * (y - 628) / (950 - 628));   // სიგანე სიღრმის მიხედვით: ბორცვთან ვიწრო, ახლოს ფართო
+  s += road(lavaP, lavaW, 0, '#ff5a14').replace('/>', ` filter="url(#${id}-blur)" opacity=".9"/>`) + road(lavaP, lavaW, 0, `url(#${id}-lava)`);
+  for (const t of [.26, .42, .57, .71, .85]) {                 // გაცივებული ქერქის ლაქები
+    const [x, y] = bez(lavaP, t), rx = lavaW(y) * .22;
+    s += `<ellipse cx="${P(x)}" cy="${P(y)}" rx="${P(rx)}" ry="${P(rx * .22)}" fill="#3a1810" opacity=".75"/>`;
+  }
+  const shine = [];                                              // ნათელი ნაკადი შუაში
+  for (let t = .12; t <= 1; t += .04) { const [x, y] = bez(lavaP, t), [nx, ny] = normal(lavaP, t), o = -lavaW(y) * .18; shine.push(`${P(x + nx * o)},${P(y + ny * o)}`); }
+  s += `<polyline points="${shine.join(' ')}" stroke="#fff2a8" stroke-width="3" fill="none" opacity=".6" stroke-linecap="round"/></g>`;
+  const cracks = 'M1220,720 L1250,732 L1272,726 L1290,742 M1420,750 L1446,762 L1470,756 M1230,800 L1262,812 L1280,806 L1300,822 M1450,850 L1478,842 L1500,858';
+  s += `<path d="${cracks}" stroke="#ff5a14" stroke-width="7" fill="none" opacity=".35" stroke-linejoin="round"/><path d="${cracks}" stroke="#ffb43a" stroke-width="2.4" fill="none" stroke-linejoin="round"/>`;
+  s += embers(SPLIT + 30, 1650, 440, 880, 60, 107);
+
+  // ახლო გზები Y-ს ფორმით: ქვემოდან ერთი ფართო გზა მოდის, შეერთების წერტილში (FORK) ორად იყოფა
+  // და ორივე განშტოება ბორცვზე ადის, თხემზე იკარგება. ყველა ნაწილს ერთი ფერი აქვს (სიკეთის მხარეს ქვიშა, ბოროტების — მუქი)
+  const FORK = [SPLIT, FORK_Y];
+  const roadW = y => Math.max(8, 140 * (y - 596) / 220);          // სიგანე სიღრმის მიხედვით
+  const goodPath = [FORK, [905, 806], [782, 716], [760, P(near.y(760) + 3)]];
+  const evilPath = [FORK, [1115, 806], [1238, 716], [1260, P(near.y(1260) + 3)]];
+  const roadFill = `url(#${id}-trunk)`;
+  s += `<defs><linearGradient id="${id}-trunk" gradientUnits="userSpaceOnUse" x1="${SPLIT - 120}" y1="0" x2="${SPLIT + 120}" y2="0">` +
+    `<stop offset="0" stop-color="${THEME.road}"/><stop offset=".5" stop-color="#a6876a"/><stop offset="1" stop-color="#5a4038"/></linearGradient></defs>`;
+  // ბორცვის ხაზი: ქვემოთ — ბორცვზე (გზა), ზემოთ — ბორცვს მიღმა (თხემს გადაღმა ჩამავალი ჯარი)
+  let nearLine = '';
+  for (let x = -200; x <= 1800; x += 10) nearLine += ` ${x},${P(near.y(x))}`;
+  s += `<defs><clipPath id="${id}-onNear"><polygon points="-200,${H + 400}${nearLine} 1800,${H + 400}"/></clipPath>` +
+    `<clipPath id="${id}-overNear"><polygon points="-200,-400${nearLine} 1800,-400"/></clipPath></defs>`;
+  // გზა თხემს გადაღმა გრძელდება და ზუსტად ბორცვის ხაზთან იმალება
+  const goodRoad = [goodPath[0], goodPath[1], goodPath[2], [757, P(near.y(757) - 14)]];
+  const evilRoad = [evilPath[0], evilPath[1], evilPath[2], [1263, P(near.y(1263) - 14)]];
+  s += `<g clip-path="url(#${id}-onNear)">${road(goodRoad, roadW, 0, roadFill)}${road(evilRoad, roadW, 0, roadFill)}</g>`;
+  s += `<g stroke="${roadFill}" stroke-width="2" stroke-linejoin="round">${road([[SPLIT, 1650], [SPLIT, 1200], [SPLIT, 960], [SPLIT, 840]], roadW, 0, roadFill)}</g>`;   // stroke ფარავს ნაკერს
+  s += `<ellipse cx="${SPLIT}" cy="770" rx="40" ry="11" fill="${roadFill}"/>`;   // განშტოებებს შორის კუთხეს არბილებს
+  // გარე კუთხეების მომრგვალება იქ, სადაც განშტოება ფართო გზიდან გამოდის (dir: -1 — სიკეთის მხარე, 1 — ბოროტების)
+  const fillet = (p, dir) => {
+    const edge = t => {
+      const [x, y] = bez(p, t), [nx, ny] = normal(p, t), w = roadW(y) / 2, a = [x + nx * w, y + ny * w], b = [x - nx * w, y - ny * w];
+      return dir * (a[0] - SPLIT) > dir * (b[0] - SPLIT) ? a : b;                  // გარე კიდე
+    };
+    let tc = 0;
+    while (tc < .6 && dir * (edge(tc)[0] - SPLIT) <= roadW(edge(tc)[1]) / 2) tc += .005;   // სად გამოდის კიდე ფართო გზიდან
+    const C = edge(tc), B = edge(Math.min(1, tc + .16)), ay = C[1] + 70, A = [SPLIT + dir * roadW(ay) / 2, ay];
+    return `<path d="M${P(A[0])},${P(A[1])} L${P(C[0])},${P(C[1])} L${P(B[0])},${P(B[1])} Q${P(C[0])},${P(C[1])} ${P(A[0])},${P(A[1])} Z" fill="${roadFill}" stroke="${roadFill}" stroke-width="2" stroke-linejoin="round"/>`;   // stroke ფარავს ნაკერს
+  };
+  s += fillet(goodPath, -1) + fillet(evilPath, 1);
+  // თხემს გადაღმა ჩამავალი რიგები: ყოველი შემდეგი უფრო დაბლაა ჩასული — ჯერ თავები ჩანს, მერე მხოლოდ შუბის წვერები
+  const overCrest = (cx, dir, colors, seed, o) => {
+    const r = rng(seed), cy = near.y(cx); let g = '';
+    for (let k = 4; k >= 1; k--) {
+      const sc = .42 * (1 - k * .05), by = cy + 2 + k * 8, bx = cx + dir * k * 3;
+      if (o.giant && k === 3) g += giant(bx, by, sc, GIANT, id);     // გოლიათის თავი და კეტი თხემს მიღმიდან მოჩანს
+      else for (const side of [-1, 0, 1]) g += soldier(bx + side * 17 * sc, by, sc, colors[Math.floor(r() * colors.length)], r() < .7 ? 'spear' : 'shield', false, o.torch && r() < o.torch, id);
+      if (k === 2) g += banner(bx + 22 * sc, by, 74 * sc, ...o.flag, sc * .75);
+    }
+    return `<g clip-path="url(#${id}-overNear)">${g}</g>`;
+  };
+  s += overCrest(760, -1, GOOD_ARMY, 95, { flag: ['#2f62b8', '#f2d27a', 'ring'] });
+  s += overCrest(1260, 1, EVIL_ARMY, 97, { torch: .2, giant: true, flag: ['#1a1418', '#e0402a', 'tri'] });
+  s += marchColumn(goodPath, GOOD_ARMY, id, 81,
+    { s0: 1.25, s1: .42, tMin: .14, tMax: .97, flag: ['#2f62b8', '#f2d27a', 'ring'] });
+  s += marchColumn(evilPath, EVIL_ARMY, id, 83,
+    { s0: 1.25, s1: .42, tMin: .14, tMax: .97, torch: .12, giant: 8, flag: ['#1a1418', '#e0402a', 'tri'] });
+
+  for (const [x, y, sc] of [[470, 880, 1.7], [540, 910, 2.1], [380, 905, 1.6]]) s += tree(x, y, sc, THEME.tree, THEME.treeShade);
+  for (const [x, y, sc] of [[1480, 900, 2], [1560, 880, 1.7]]) s += deadTree(x, y, sc);
+  return s;
+}
+
+const FOCUS = [640, 1380];   // ვერტიკალურ ეკრანზე (ტელეფონი) ჩანს სცენის ეს ნაწილი — ცენტრი და ორივე მხარის ნაწილი
+
+document.querySelector('.scene').style.background = THEME.sky;
+const svg = document.getElementById('bg');
+svg.innerHTML = drawScene('bg');
+
+// ტელეფონზე (ვიწრო ან ვერტიკალური ეკრანი) ნახატი მთელ ეკრანს ფარავს, ხმალი ზუსტად შუაშია
+// და სცენა რაც შეიძლება მაღლაა აწეული — ხმლის წვერი იწყება სათაურის ტექსტის ქვემოთ.
+// ქვემოთ გზა გრძელდება: ზედა ნაწილი წარწერისთვისაა, ქვედაში დგას „დაიწყე“ ღილაკი
+const SWORD_TOP = 330;
+const MOBILE = matchMedia('(max-aspect-ratio: 1/1), (max-width: 760px)');
+const roadCta = document.getElementById('roadCta'), heroInner = document.querySelector('.hero-inner');
+// კომპიუტერზე ღილაკი დგას ნახატის ამ წერტილზე — ბოროტი ჯარის მარჯვნივ, ლავის მარცხნივ, ბნელ მიწაზე
+const DESKTOP_CTA = [1370, 795];
+function fit() {
+  if (!MOBILE.matches) {
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    const m = svg.getScreenCTM(), pt = new DOMPoint(...DESKTOP_CTA).matrixTransform(m);
+    roadCta.style.left = `${P(pt.x)}px`;
+    roadCta.style.top = `${P(Math.min(innerHeight - 46, pt.y))}px`;
+    return;
+  }
+  roadCta.style.left = '50%';
+  const textBottom = heroInner.getBoundingClientRect().bottom + 6;           // სცენა იწყება ტექსტის ქვეშ
+  const need = FORK_Y + 300 - SWORD_TOP;                                     // ხმლის წვერიდან ღილაკამდე (ნახატის ერთეულებში)
+  // დაბალ ეკრანზე სცენა პატარავდება, მაგრამ არა იმდენად, რომ ნახატის გვერდითი კიდეები გამოჩნდეს (სიგანე ≤ 1300)
+  const k = Math.max(innerWidth / 1300, Math.min(innerWidth / (FOCUS[1] - FOCUS[0]), (innerHeight - textBottom) / need));
+  const w = innerWidth / k, h = innerHeight / k, top = SWORD_TOP - textBottom / k;
+  svg.setAttribute('viewBox', `${P(SPLIT - w / 2)} ${P(top)} ${P(w)} ${P(h)}`);
+  // ღილაკი გზაზე: ჯარების შეერთებასა და ეკრანის ქვედა კიდეს შორის, ზემოთ ადგილი რჩება წარწერისთვის
+  const forkPx = (FORK_Y + 70 - top) * k;
+  roadCta.style.top = `${P(Math.min(innerHeight - 46, forkPx + (innerHeight - forkPx) * .55))}px`;
+}
+addEventListener('resize', fit);
+fit();
+document.fonts?.ready.then(fit);   // შრიფტის ჩატვირთვის შემდეგ ტექსტის სიმაღლე იცვლება
+
+
+// ენის შეცვლა: ჩამოსაშლელი სია. თარგმანები ჯერ არ არის — ჯერჯერობით ინახება მხოლოდ არჩეული ენა
+const langBtn = document.getElementById('langBtn'), langMenu = document.getElementById('langMenu');
+const langCode = document.getElementById('langCode'), langHeadCode = document.getElementById('langHeadCode');
+const langItems = [...langMenu.querySelectorAll('button[data-code]')];
+const setLang = code => {
+  const item = langItems.find(b => b.dataset.code === code) || langItems[0];
+  langCode.textContent = langHeadCode.textContent = item.dataset.short;
+  langItems.forEach(b => b.classList.toggle('on', b === item));
+};
+// დახურული სია ზუსტად ღილაკის ზომისაა — იქიდან „იზრდება“
+const syncLangSize = () => {
+  const r = langBtn.getBoundingClientRect();
+  langMenu.style.setProperty('--bw', r.width + 'px');
+  langMenu.style.setProperty('--bh', r.height + 'px');
+};
+const toggleLang = open => {
+  syncLangSize();
+  langMenu.classList.toggle('open', open);
+  langBtn.setAttribute('aria-expanded', open);
+};
+try { setLang(localStorage.getItem('lang') || 'KA'); } catch { setLang('KA'); }
+syncLangSize();
+addEventListener('resize', syncLangSize);
+langBtn.addEventListener('click', e => { e.stopPropagation(); toggleLang(true); });
+langMenu.addEventListener('click', e => {
+  e.stopPropagation();
+  const b = e.target.closest('button[data-code]');
+  if (b) {
+    setLang(b.dataset.code);
+    try { localStorage.setItem('lang', b.dataset.code); } catch {}
+  }
+  toggleLang(false);                                         // ენის არჩევა ან ზედა ზოლზე დაჭერა კეცავს სიას
+});
+document.addEventListener('click', () => toggleLang(false));
+addEventListener('keydown', e => { if (e.key === 'Escape') toggleLang(false); });
+
+
+</script>
+</body>
+</html>

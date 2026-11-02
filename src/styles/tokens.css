@@ -1,0 +1,23 @@
+/* დიზაინის ტოკენები: ფერები, შრიფტები, ზომები — ერთ ადგილას, რომ მთელ საიტზე ერთნაირი იყოს */
+:root {
+  /* ფერები */
+  --ink: #f6efe4;              /* მთავარი ტექსტი */
+  --muted: #d8cbb6;            /* მეორეხარისხოვანი ტექსტი */
+  --gold: #f2b54a;
+  --gold-light: #ffe29a;
+  --gold-text: #ffd99a;
+  --gold-deep: #e09a2c;
+  --night: #0b0816;            /* გვერდის ფონი (სანამ ნახატი ჩაიტვირთება) */
+  --glass: rgba(14, 9, 30, .5);
+  --line: rgba(255, 255, 255, .12);
+
+  /* შრიფტები */
+  --font-sans: 'Noto Sans Georgian', system-ui, sans-serif;
+  --font-serif: 'Noto Serif Georgian', serif;
+  --font-latin: system-ui, 'Noto Sans Georgian', sans-serif;   /* ლათინური / კირილიცა / სომხური ენების სახელები */
+
+  /* ზომები */
+  --gutter: clamp(16px, 7vw, 128px);
+  --header-pad: clamp(16px, 5vw, 56px);
+  --radius: 14px;
+}

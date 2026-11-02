@@ -1,0 +1,59 @@
+{
+  "subject": "geography",
+  "topic": "capitals-europe",
+  "level": 1,
+  "title": { "ka": "ევროპის დედაქალაქები", "en": "Capitals of Europe" },
+  "questions": [
+    {
+      "id": "capital-france",
+      "type": "single_choice",
+      "prompt": { "ka": "რომელია საფრანგეთის დედაქალაქი?", "en": "What is the capital of France?" },
+      "options": [
+        { "id": "a", "text": { "ka": "პარიზი", "en": "Paris" } },
+        { "id": "b", "text": { "ka": "ლიონი", "en": "Lyon" } },
+        { "id": "c", "text": { "ka": "მარსელი", "en": "Marseille" } },
+        { "id": "d", "text": { "ka": "ნიცა", "en": "Nice" } }
+      ],
+      "answer": "a",
+      "explanation": { "ka": "პარიზი საფრანგეთის დედაქალაქია, აქ დგას ეიფელის კოშკი." },
+      "timeLimitSec": 15
+    },
+    {
+      "id": "flag-georgia",
+      "type": "flag_pick",
+      "prompt": { "ka": "იპოვე საქართველოს დროშა", "en": "Find the flag of Georgia" },
+      "options": [
+        { "id": "ge", "country": "GE" },
+        { "id": "ch", "country": "CH" },
+        { "id": "dk", "country": "DK" },
+        { "id": "gb", "country": "GB" }
+      ],
+      "answer": "ge"
+    },
+    {
+      "id": "map-italy",
+      "type": "map_pick",
+      "prompt": { "ka": "რუკაზე აჩვენე იტალია", "en": "Show Italy on the map" },
+      "answer": "IT"
+    },
+    {
+      "id": "landmark-eiffel",
+      "type": "image_choice",
+      "prompt": { "ka": "რომელ ქალაქშია ეს ღირსშესანიშნაობა?" },
+      "media": { "image": "assets/landmarks/eiffel-tower.webp" },
+      "options": [
+        { "id": "paris", "text": { "ka": "პარიზი" } },
+        { "id": "rome", "text": { "ka": "რომი" } },
+        { "id": "london", "text": { "ka": "ლონდონი" } }
+      ],
+      "answer": "paris"
+    },
+    {
+      "id": "capital-tf-germany",
+      "type": "true_false",
+      "prompt": { "ka": "გერმანიის დედაქალაქი მიუნხენია.", "en": "The capital of Germany is Munich." },
+      "answer": false,
+      "explanation": { "ka": "გერმანიის დედაქალაქი ბერლინია." }
+    }
+  ]
+}

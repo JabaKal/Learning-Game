@@ -1,0 +1,16 @@
+/* საბაზისო სტილი: reset, ერთი ეკრანი (სქროლის გარეშე), ხელმისაწვდომობა */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; overflow: hidden; }          /* მთავარი გვერდი ერთ ეკრანზეა */
+body { background: var(--night); color: var(--ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+main { position: relative; z-index: 1; }
+
+/* სანამ კომპონენტები ჩაიტვირთება, გვერდი ნაზად ჩნდება */
+body > :not(script) { transition: opacity .35s; }
+html:not(.is-ready) body > :not(script) { opacity: 0; }
+
+:focus-visible { outline: 2px solid var(--gold-text); outline-offset: 3px; border-radius: 6px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

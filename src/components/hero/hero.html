@@ -1,0 +1,36 @@
+<section class="hero" id="home">
+  <div class="hero__inner">
+    <div class="hero__eyebrow" data-i18n="hero.eyebrow"></div>
+    <h1 class="hero__title" data-i18n-html="hero.title"></h1>
+    <div class="hero__divider" aria-hidden="true"><i></i><b></b><i></i></div>
+    <p class="hero__lead">
+      <span data-i18n-html="hero.lead"></span>
+      <span class="hero__lead-2" data-i18n="hero.lead2"></span>
+    </p>
+
+    <!-- ტელეფონზე: კაფსულა დროშებით და გეოგრაფიით (დაჭერისას — მინიშნება), იხ. hero.js -->
+    <div class="hero__mobile-teach" data-list="mobileTeach"></div>
+
+    <!-- რას ვასწავლით: საგნები, გეოგრაფია, თამაშის რეჟიმები, სწავლების ენები (სიებს ავსებს hero.js) -->
+    <div class="hero__card">
+      <div class="hero__row hero__row--subjects">
+        <div class="hero__label"><span class="hero__icon" data-icon="book"></span><b data-i18n="hero.subjectsLabel"></b></div>
+        <div class="hero__items" data-list="subjects"></div>
+      </div>
+      <div class="hero__row hero__row--geography">
+        <div class="hero__label"><span class="hero__icon" data-icon="map"></span><b data-i18n="hero.geographyLabel"></b></div>
+        <div class="hero__items" data-list="geography"></div>
+      </div>
+      <div class="hero__row hero__row--modes">
+        <div class="hero__label"><span class="hero__icon" data-icon="swords"></span><b data-i18n="hero.modesLabel"></b></div>
+        <div class="hero__items" data-list="modes"></div>
+      </div>
+      <div class="hero__row hero__row--languages">
+        <div class="hero__label"><span class="hero__icon" data-icon="globe"></span><b data-i18n="hero.languagesLabel"></b></div>
+        <div class="hero__items" data-list="languages"></div>
+      </div>
+    </div>
+
+    <div class="hero__chips" data-list="chips"></div>
+  </div>
+</section>
