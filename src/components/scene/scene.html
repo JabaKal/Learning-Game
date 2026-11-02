@@ -1,6 +1,8 @@
 <div class="scene" aria-hidden="true">
-  <!-- ფონის ნახატი იხატება კოდით (draw/draw-scene.js); მომავალში შეიცვლება ნამდვილი გრაფიკით -->
-  <svg class="scene__svg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice" viewBox="0 0 1600 900"></svg>
+  <!-- ორი ფენა (იხ. scene.js და draw/fx.js): უძრავი ნახატი ერთხელ იხატება canvas-ზე (ჩვეულებრივი ბიტმაპი, რომელსაც ანიმაციები აღარ ეხება);
+       მოძრავი ნაწილები (დროშები, ალი, ნაპერწკლები, ვარსკვლავები, გვირგვინი) — პატარა SVG ზემოდან. ორივე ერთნაირადაა მორგებული ეკრანზე. -->
+  <canvas class="scene__layer scene__canvas"></canvas>
+  <svg class="scene__layer scene__fx" xmlns="http://www.w3.org/2000/svg"></svg>
 </div>
 
 <!-- Live Server ჩასვამს თავის სკრიპტს ამ ტეგის წინ (main.js მას შლის); თავად ტეგი იგნორირდება -->

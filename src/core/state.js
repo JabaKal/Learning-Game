@@ -1,7 +1,9 @@
 /* საერთო მდგომარეობა და მოვლენები.
    set(key, value) — ცვლის მნიშვნელობას და აცნობებს გამომწერებს;
    on(key, fn) — გამოწერა (fn მაშინვე იძახება მიმდინარე მნიშვნელობით, თუ ის უკვე არსებობს). */
-import { DEFAULT_LANG, LANGUAGES } from '../i18n/languages.js';
+import { LANGUAGES } from '../i18n/languages.js';
+import { detectHomeLang, testCountry } from './geo.js';
+import { getPref, setPref } from './prefs.js';
 
 const values = {};
 const listeners = {};
@@ -20,16 +22,23 @@ export function on(key, fn) {
   return () => { listeners[key] = listeners[key].filter(f => f !== fn); };
 }
 
-// ენა ინახება ბრაუზერში (მომხმარებლის ანგარიშის შექმნის შემდეგ — ბაზაშიც, users.interface_lang)
-export function initState() {
-  let lang = DEFAULT_LANG;
-  try {
-    const saved = (localStorage.getItem('lang') || '').toLowerCase();
-    if (LANGUAGES.some(l => l.code === saved)) lang = saved;
-  } catch {}
-  set('lang', lang);
-  on('lang', code => {
-    document.documentElement.lang = code;
-    try { localStorage.setItem('lang', code); } catch {}
-  });
+// ენა: თუ სტუმარმა თვითონ აირჩია — ის (prefs.js — ინახება ბრაუზერში და შემდეგ ვიზიტზეც დახვდება).
+// სხვაგვარად — „სახლის“ ენა IP-ით (geo.js): მისი ქვეყნის ენა, თუ თარგმანი გვაქვს, თორემ ინგლისური.
+// homeLang — ეს ენა სიებში პირველია. ?country=XX-ით (ტესტი) შენახული არჩევანი იგნორირდება — ახალი სტუმარივით
+export async function initState() {
+  const home = await detectHomeLang();
+  const saved = String(getPref('lang') || '').toLowerCase();
+  const chosen = !testCountry() && LANGUAGES.some(l => l.code === saved) ? saved : null;
+  set('homeLang', home);
+  set('lang', chosen || home);
+  on('lang', code => { document.documentElement.lang = code; });
+}
+
+// სტუმრის საკუთარი არჩევანი (ენის ღილაკიდან) — ინახება და შემდეგ ვიზიტზეც ის დახვდება.
+// შეცვლამდე — 'langChanging': კომპონენტები იმახსოვრებენ ელემენტების ადგილს, რომ ახალ ადგილზე ანიმაციით გადავიდნენ (hero.js)
+export function chooseLang(code) {
+  setPref('lang', code);
+  if (code === get('lang')) return;
+  set('langChanging', { code });
+  set('lang', code);
 }

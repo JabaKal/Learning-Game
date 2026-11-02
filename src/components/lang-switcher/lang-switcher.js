@@ -1,7 +1,7 @@
 /* ენის შეცვლა: ღილაკი ხსნის სიას, ენის არჩევა ცვლის საერთო მდგომარეობას (state 'lang'),
    რის შემდეგაც მთელი გვერდი ითარგმნება (core/i18n.js). */
-import { on, set } from '../../core/state.js';
-import { LANGUAGES } from '../../i18n/languages.js';
+import { on, get, chooseLang } from '../../core/state.js';
+import { LANGUAGES, orderLanguages } from '../../i18n/languages.js';
 
 const CHECK = '<svg class="lang__check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
@@ -10,7 +10,7 @@ export function init(root) {
   const menu = root.querySelector('.lang__menu');
   const list = root.querySelector('.lang__list');
 
-  list.innerHTML = LANGUAGES.map((l, i) =>
+  list.innerHTML = orderLanguages(get('homeLang')).map((l, i) =>
     `<button type="button" role="menuitem" class="lang__item" data-code="${l.code}" style="--i:${i}"><small>${l.short}</small><span>${l.name}</span>${CHECK}</button>`).join('');
   const items = [...list.children];
 
@@ -43,7 +43,7 @@ export function init(root) {
     if (!item) return;
     // ✓ მაშინვე გადადის არჩეულ ენაზე; თავად ენა იცვლება დაკეცვის ანიმაციის შემდეგ, რომ გვერდის თარგმნამ ანიმაცია არ გააჭედოს
     items.forEach(b => b.classList.toggle('lang__item--on', b === item));
-    setTimeout(() => set('lang', item.dataset.code), 280);
+    setTimeout(() => chooseLang(item.dataset.code), 280);
   });
   document.addEventListener('click', () => toggle(false));
   addEventListener('keydown', e => { if (e.key === 'Escape') toggle(false); });

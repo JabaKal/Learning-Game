@@ -1,11 +1,18 @@
 // ჯარი: ადამიანები, ელფები, ჯუჯები, ორკები, გოლიათები, დროშები, კოლონები
-import { P, rng, hazed, bez, normal } from './utils.js';
+import { P, rng, hazed, curve } from './utils.js';
+import { anim } from './fx.js';
+
+// ჩრდილი ფეხებთან — ფიგურა მიწაზე „დგას“ და არ ტივტივებს
+const shadow = (rx = 11) => `<ellipse cx="0" cy="0" rx="${rx}" ry="${P(rx * .24)}" fill="#000" opacity=".22"/>`;
+// ჩირაღდანი: ნათება უძრავია (ფიგურის უკან), ალი — მოძრავ ფენაში
+const torchFlame = (tf, dy) => anim(`<path d="M-15.5,${dy} Q-15.5,${dy - 9} -12,${dy - 16} Q-8.5,${dy - 9} -8.5,${dy} Z" fill="#ffb347" class="flicker"/>`, tf);
 
 // ---------- ჯარი ----------
 export function soldier(x, y, s, c, kind, mirror, torch, id) {
   if (c.race) return creature(x, y, s, c, kind, mirror, torch, id);
-  let g = `<g transform="translate(${P(x)},${P(y)}) scale(${P(mirror ? -s : s)},${P(s)})">`;
-  if (torch) g += `<circle cx="-12" cy="-62" r="28" fill="url(#${id}-glow)" class="flicker"/>`;
+  const tf = `<g transform="translate(${P(x)},${P(y)}) scale(${P(mirror ? -s : s)},${P(s)})">`;
+  let g = tf + shadow();
+  if (torch) g += `<circle cx="-12" cy="-62" r="28" fill="url(#${id}-glow)"/>`;
   g += `<rect x="-5" y="-15" width="4" height="15" fill="${c.dark}"/><rect x="1" y="-15" width="4" height="15" fill="${c.dark}"/>`;
   g += `<path d="M-8.5,-13 L-6.5,-32 L6.5,-32 L8.5,-13 Z" fill="${c.body}"/><path d="M0,-32 L6.5,-32 L8.5,-13 L0,-13 Z" fill="#000" opacity=".18"/>`;
   g += `<rect x="-7.5" y="-21" width="15" height="2.6" fill="${c.trim}"/>`;
@@ -15,13 +22,14 @@ export function soldier(x, y, s, c, kind, mirror, torch, id) {
   else if (kind === 'shield') g += `<line x1="9.5" y1="-52" x2="9.5" y2="1" stroke="${c.wood}" stroke-width="1.8"/><polygon points="9.5,-59 12,-51 7,-51" fill="${c.metal}"/><circle cx="-8" cy="-22" r="8.5" fill="${c.trim}"/><circle cx="-8" cy="-22" r="5.6" fill="${c.body}"/><circle cx="-8" cy="-22" r="1.8" fill="${c.trim}"/>`;
   else if (kind === 'bow') g += `<path d="M8,-48 Q19,-30 8,-10" stroke="${c.wood}" stroke-width="2" fill="none"/><line x1="8" y1="-48" x2="8" y2="-10" stroke="${c.trim}" stroke-width=".7"/>`;
   else if (kind === 'sword') g += `<line x1="9" y1="-18" x2="16" y2="-48" stroke="${c.metal}" stroke-width="2.4"/><line x1="5" y1="-22" x2="13" y2="-20" stroke="${c.trim}" stroke-width="2"/>`;
-  if (torch) g += `<line x1="-9" y1="-24" x2="-12" y2="-56" stroke="${c.wood}" stroke-width="2"/><path d="M-15.5,-55 Q-15.5,-64 -12,-71 Q-8.5,-64 -8.5,-55 Z" fill="#ffb347" class="flicker"/>`;
+  if (torch) g += `<line x1="-9" y1="-24" x2="-12" y2="-56" stroke="${c.wood}" stroke-width="2"/>` + torchFlame(tf, -55);
   return g + '</g>';
 }
 
 // ელფები, ჯუჯები და ორკები — თითოეულს თავისი სილუეტი და იარაღი აქვს
 export function creature(x, y, s, c, kind, mirror, torch, id) {
-  let g = `<g transform="translate(${P(x)},${P(y)}) scale(${P(mirror ? -s : s)},${P(s)})">`;
+  const tf = `<g transform="translate(${P(x)},${P(y)}) scale(${P(mirror ? -s : s)},${P(s)})">`;
+  let g = tf + shadow(c.race === 'dwarf' ? 12 : 11);
   if (c.race === 'elf') {          // მაღალი და წვრილი, გრძელი თმა, წვეტიანი ყურები, მოსასხამი
     g += `<path d="M-7,-36 L-11,-5 L11,-5 L7,-36 Z" fill="${c.cloak}"/>`;
     g += `<rect x="-4.5" y="-17" width="3.6" height="17" fill="${c.dark}"/><rect x=".9" y="-17" width="3.6" height="17" fill="${c.dark}"/>`;
@@ -43,7 +51,7 @@ export function creature(x, y, s, c, kind, mirror, torch, id) {
     g += kind === 'shield' ? `<rect x="4" y="-40" width="10" height="7" rx="1" fill="${c.metal}"/>`               // ურო
                            : `<path d="M9,-36 Q18,-38 18,-27 Q13,-29 9,-28 Z" fill="${c.metal}"/>`;         // ცული
   } else if (c.race === 'orc') {   // მოხრილი, განიერმხრებიანი, მწვანე კანი, ეშვები, წითელი თვალები
-    if (torch) g += `<circle cx="-12" cy="-60" r="28" fill="url(#${id}-glow)" class="flicker"/>`;
+    if (torch) g += `<circle cx="-12" cy="-60" r="28" fill="url(#${id}-glow)"/>`;
     g += `<rect x="-6.5" y="-14" width="5.2" height="14" fill="${c.dark}"/><rect x="1.3" y="-14" width="5.2" height="14" fill="${c.dark}"/>`;
     g += `<path d="M-10,-12 L-9.5,-31 L9.5,-31 L10,-12 Z" fill="${c.body}"/><path d="M0,-31 L9.5,-31 L10,-12 L0,-12 Z" fill="#000" opacity=".2"/>`;
     g += `<polygon points="-12.5,-29 -10,-37 -5,-31" fill="${c.metal}"/><polygon points="12.5,-29 10,-37 5,-31" fill="${c.metal}"/>`;
@@ -55,14 +63,14 @@ export function creature(x, y, s, c, kind, mirror, torch, id) {
     if (kind === 'shield') g += `<line x1="9" y1="-14" x2="13" y2="-40" stroke="${c.wood}" stroke-width="2"/><polygon points="11,-40 20,-45 19,-31 13.5,-33" fill="${c.blade}"/>` +
       `<circle cx="-8.5" cy="-21" r="8.5" fill="${c.trim}"/><circle cx="-8.5" cy="-21" r="6" fill="#1a1216"/><path d="M-11,-24 L-6,-21 L-11,-18" stroke="${c.trim}" stroke-width="1.6" fill="none"/>`;   // საჭრელი და ფარი
     else g += `<line x1="9.5" y1="-58" x2="9.5" y2="1" stroke="${c.wood}" stroke-width="2"/><polygon points="9.5,-68 13,-58 9.5,-55 6,-58" fill="${c.blade}"/><polygon points="9.5,-58 13.5,-61 11,-56" fill="${c.blade}"/>`;   // უხეში შუბი
-    if (torch) g += `<line x1="-9" y1="-24" x2="-12" y2="-54" stroke="${c.wood}" stroke-width="2"/><path d="M-15.5,-53 Q-15.5,-62 -12,-69 Q-8.5,-62 -8.5,-53 Z" fill="#ffb347" class="flicker"/>`;
+    if (torch) g += `<line x1="-9" y1="-24" x2="-12" y2="-54" stroke="${c.wood}" stroke-width="2"/>` + torchFlame(tf, -53);
   }
   return g + '</g>';
 }
 
 // გოლიათი (ტროლი): ორკზე ორჯერ მაღალი, ეკლიანი კეტი მხარზე
 export function giant(x, y, s, c, id) {
-  let g = `<g transform="translate(${P(x)},${P(y)}) scale(${P(s)})">`;
+  let g = `<g transform="translate(${P(x)},${P(y)}) scale(${P(s)})">` + shadow(20);
   g += `<rect x="-13" y="-36" width="11" height="36" fill="${c.skinDark}"/><rect x="2" y="-36" width="11" height="36" fill="${c.skinDark}"/>`;
   g += `<polygon points="-15,-38 15,-38 11,-20 -11,-20" fill="${c.cloth}"/>`;
   g += `<path d="M-17,-36 Q-22,-66 -11,-80 L11,-80 Q22,-66 17,-36 Z" fill="${c.skin}"/><path d="M0,-80 L11,-80 Q22,-66 17,-36 L0,-36 Z" fill="#000" opacity=".18"/>`;
@@ -77,6 +85,7 @@ export function giant(x, y, s, c, id) {
   return g + '</g>';
 }
 
+// დროშა: ტარი უძრავ ფენაშია, ქსოვილი (ფრიალებს) — მოძრავში
 export function banner(x, y, h, col, em, shape, sc = 1) {
   const fw = 46 * sc, fh = 32 * sc, top = y - h, fx = x + 1.5 * sc;
   const cx = fx + fw / 2, cy = top + fh / 2, r = 7 * sc, sw = P(2.6 * sc);
@@ -97,29 +106,36 @@ export function banner(x, y, h, col, em, shape, sc = 1) {
   }
   return `<line x1="${P(x)}" y1="${P(y)}" x2="${P(x)}" y2="${P(top - 6 * sc)}" stroke="#23170f" stroke-width="${P(3 * sc)}" stroke-linecap="round"/>` +
     `<circle cx="${P(x)}" cy="${P(top - 7 * sc)}" r="${P(3.2 * sc)}" fill="#d8a640"/>` +
-    `<g class="flag" style="animation-delay:-${(Math.random() * 2).toFixed(2)}s"><rect x="${P(fx)}" y="${P(top)}" width="${P(fw)}" height="${P(fh)}" fill="${col}"/>${e}</g>`;
+    anim(`<g class="flag" style="animation-delay:-${(Math.random() * 2).toFixed(2)}s"><rect x="${P(fx)}" y="${P(top)}" width="${P(fw)}" height="${P(fh)}" fill="${col}"/>${e}</g>`);
 }
 
-// ჯარის კოლონა გზაზე: კარიბჭესთან პატარა (შორს), ქვემოთ დიდი (მაყურებელთან ახლოს)
+// ჯარის კოლონა გზაზე: კარიბჭესთან პატარა (შორს), ქვემოთ დიდი (მაყურებელთან ახლოს).
+// p — ბეზიეს 4 წერტილი (ახლო გზები) ან სერპანტინი (trail — შორეული ბილიკები ციხეებისკენ).
+// o.files — რამდენი ჯარისკაცია რიგში (ნაგულისხმევად 3; შორეულ ბილიკზე 2 — მოწესრიგებული, წყვილ-წყვილად მავალი კოლონა),
+// o.gap — რიგებს შორის მანძილი, o.torchEvery — ყოველ N-ე რიგში ერთი ჩირაღდანი (თანაბრად, შემთხვევითობის ნაცვლად).
+// ახლო რიგები ოდნავ მეჩხერია (დაშორება და ხანდახან ორი ჯარისკაცი სამის ნაცვლად), რომ წინა პლანი ხმაურად არ იკითხებოდეს
 export function marchColumn(p, colors, id, seed, o) {
-  const r = rng(seed), scale = t => o.s0 * Math.pow(o.s1 / o.s0, Math.pow(t / o.tMax, 1.4)), ranks = [];
-  const t0 = o.tMin || .02;
-  let g = '', last = bez(p, t0), dist = Infinity;
+  const path = curve(p), r = rng(seed), scale = t => o.s0 * Math.pow(o.s1 / o.s0, Math.pow(t / o.tMax, 1.4)), ranks = [];
+  const t0 = o.tMin || .02, files = o.files === 2 ? [-.5, .5] : [-1, 0, 1], gap = o.gap || 20;
+  let g = '', last = path.at(t0), dist = Infinity;
   for (let t = t0; t <= o.tMax; t += .002) {
-    const pt = bez(p, t);
+    const pt = path.at(t), s = scale(t);
     dist += Math.hypot(pt[0] - last[0], pt[1] - last[1]); last = pt;
-    if (dist >= 20 * scale(t)) { ranks.push(t); dist = 0; }
+    if (dist >= (gap + (o.files === 2 ? 0 : 8 * s / o.s0)) * s) { ranks.push(t); dist = 0; }
   }
   let i = 0;
   for (const t of ranks.reverse()) {
-    const [x, y] = bez(p, t), [nx, ny] = normal(p, t), s = scale(t), off = 17 * s;
+    const [x, y] = path.at(t), [nx, ny] = path.nrm(t), s = scale(t), off = 17 * s;
     i++;
     if (o.giant && i % o.giant === 3) g += giant(x, y, s, o.giantC || GIANT, id);     // ზოგ რიგში — გოლიათი
-    else for (const side of [-1, 0, 1]) {
+    else for (const side of files) {
       const c = colors[Math.floor(r() * colors.length)];
-      g += soldier(x + nx * off * side, y + ny * off * side, s, c, r() < .7 ? 'spear' : 'shield', false, o.torch && r() < o.torch, id);
+      const kind = r() < .7 ? 'spear' : 'shield';
+      const torch = o.torchEvery ? side === files[0] && i % o.torchEvery === 1 : o.torch && r() < o.torch;
+      if (files.length === 3 && side === 0 && s / o.s0 > .6 && r() < .4) continue;    // ახლოს — ზოგჯერ შუა ჯარისკაცის გარეშე
+      g += soldier(x + nx * off * side, y + ny * off * side, s, c, kind, false, torch, id);
     }
-    if (i % 6 === 4) g += banner(x + 22 * s, y, 74 * s, o.flag[0], o.flag[1], o.flag[2], s * .75);
+    if (i % (o.bannerEvery || 6) === 4 % (o.bannerEvery || 6)) g += banner(x + 22 * s, y, 74 * s, o.flag[0], o.flag[1], o.flag[2], s * .75);
   }
   return g;
 }

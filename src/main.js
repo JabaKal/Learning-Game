@@ -40,7 +40,7 @@ async function mountAll(root) {
 }
 
 async function start() {
-  initState();
+  await initState();                                   // ენა (IP-ით, პირველ ვიზიტზე ≤ 1.5 წმ) — გვერდი მანამდე დამალულია
   const mounted = await mountAll(document.body);
   applyTranslations(document.body);
   for (const [el, module] of mounted) module.init?.(el);   // ჯერ ჩადგმული, მერე მშობელი კომპონენტი

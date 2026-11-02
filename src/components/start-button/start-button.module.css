@@ -5,6 +5,8 @@
   min-height: 60px; padding: 0 34px 0 30px; gap: 11px; border-radius: 999px; border-width: 2px;
   font-size: 19px; letter-spacing: .02em;
   animation: start-beacon 2s ease-out infinite, start-bob 3.2s ease-in-out infinite;
+  /* ადგილის შეცვლისას (ენის შეცვლა, ეკრანის ზომა) ღილაკი რბილად გადადის — სცენასთან ერთად */
+  transition: left .3s cubic-bezier(.4, 0, .2, 1), top .3s cubic-bezier(.4, 0, .2, 1), transform .18s, box-shadow .2s, filter .2s;
 }
 .start-btn .btn__icon { width: 24px; height: 24px; }
 .start-btn__arrow { width: 18px; height: 18px; margin-left: 2px; transition: transform .2s; }

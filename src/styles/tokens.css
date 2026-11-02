@@ -12,9 +12,11 @@
   --line: rgba(255, 255, 255, .12);
 
   /* შრიფტები */
-  --font-sans: 'Noto Sans Georgian', system-ui, sans-serif;
-  --font-serif: 'Noto Serif Georgian', serif;
-  --font-latin: system-ui, 'Noto Sans Georgian', sans-serif;   /* ლათინური / კირილიცა / სომხური ენების სახელები */
+  /* ქართულ Noto-ს კირილიცა და სომხური არ აქვს — მათთვის იგივე ოჯახის ზოგადი და სომხური ვარიანტები მოდის (index.html);
+     ბრაუზერი მხოლოდ იმ დამწერლობას ტვირთავს, რომელიც გვერდზეა */
+  --font-sans: 'Noto Sans Georgian', 'Noto Sans', 'Noto Sans Armenian', system-ui, sans-serif;
+  --font-serif: 'Noto Serif Georgian', 'Noto Serif', 'Noto Serif Armenian', Georgia, serif;
+  --font-latin: system-ui, 'Noto Sans Georgian', 'Noto Sans Armenian', sans-serif;   /* ლათინური / კირილიცა / სომხური ენების სახელები */
 
   /* ზომები */
   --gutter: clamp(16px, 7vw, 128px);

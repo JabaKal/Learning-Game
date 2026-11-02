@@ -1,15 +1,17 @@
 // ციხე-სიმაგრეები: სიკეთის ციხეები და ბოროტების ციტადელები
 import { P } from './utils.js';
+import { anim } from './fx.js';
 
 // ---------- გალავნიანი ციხე-სიმაგრე (X–XV საუკუნე) ----------
 export function fortress(x, y, s, c) {
+  const tf = `<g transform="translate(${x},${y}) scale(${s})">`;
   const tex = el => c.texture ? el.replace(/fill="[^"]*"/, `fill="url(#${c.id}-stone)"`) : '';
   const block = (x1, y1, w, h, fill = c.wall) => { const r = `<rect x="${x1}" y="${y1}" width="${w}" height="${h}" fill="${fill}"/>`; return r + tex(r); };
   const cren = (x1, x2, top) => { let g = ''; for (let cx = x1; cx <= x2 - 7; cx += 13) g += `<rect x="${cx}" y="${top - 9}" width="7.5" height="9.5" fill="${c.wall}"/>`; return g; };
   const slit = (sx, sy) => `<rect x="${P(sx - 1.8)}" y="${sy}" width="3.6" height="13" rx="1.5" fill="${c.dark}"/>`;
-  const pennant = (px, py) =>
+  const pennant = (px, py) =>   // ტარი უძრავია, დროშა ფრიალებს მოძრავ ფენაში
     `<line x1="${px}" y1="${py}" x2="${px}" y2="${py - 50}" stroke="${c.dark}" stroke-width="3"/>` +
-    `<g class="flag" style="animation-delay:-${(Math.random() * 2).toFixed(2)}s"><path d="M${px},${py - 50} L${px + 38},${py - 44} L${px + 34},${py - 37} L${px},${py - 32} Z" fill="${c.flag}"/></g>`;
+    anim(`<g class="flag" style="animation-delay:-${(Math.random() * 2).toFixed(2)}s"><path d="M${px},${py - 50} L${px + 38},${py - 44} L${px + 34},${py - 37} L${px},${py - 32} Z" fill="${c.flag}"/></g>`, tf);
 
   // კვადრატული კოშკი სათოფურებით
   const sqTower = (cx, base, w, h, o = {}) => {
@@ -53,7 +55,7 @@ export function fortress(x, y, s, c) {
     `<polygon points="${cx - w / 2 - 6},${top} ${cx},${top - h} ${cx + w / 2 + 6},${top}" fill="${red ? c.roof : c.slate}"/><polygon points="${cx},${top - h} ${cx + w / 2 + 6},${top} ${cx},${top}" fill="${red ? c.roofShade : c.slateShade}"/>`;
   const gate = (gx, gy, w) => `<path d="M${gx - w},${gy} V${P(gy - w * 2.6)} A${w},${w} 0 0 1 ${gx + w},${P(gy - w * 2.6)} V${gy} Z" fill="${c.dark}"/>`;
   const hilltop = (w, d) => `<polygon points="${-w},12 ${-w + 110},${-d} ${w - 110},${-d} ${w},12" fill="${c.ground}"/>`;
-  const wrap = g => `<g transform="translate(${x},${y}) scale(${s})">${g}</g>`;
+  const wrap = g => tf + g + '</g>';
 
   if (c.type === 'keep') {          // ნორმანული დონჟონი: დიდი კვადრატული კოშკი კუთხის ბურჯებით
     let g = hilltop(260, 60) + sqTower(0, -40, 170, 250);
@@ -100,7 +102,7 @@ export function darkCitadel(x, y, s, c) {
         const sx = cx - tw / 2 + tw * (i + .5) / 5, sw = tw / 5 * .45, sh = i === 2 ? h * .32 : (i % 2 ? h * .12 : h * .18);
         pts += ` ${P(sx - sw)},${top} ${P(sx)},${P(top - sh)} ${P(sx + sw)},${top}`;
       }
-      g += `<circle cx="${cx}" cy="${top - 10}" r="${w * 1.1}" fill="url(#${c.id}-evilglow)" class="pulse"/>`;
+      g += `<circle cx="${cx}" cy="${top - 10}" r="${w * 1.1}" fill="url(#${c.id}-evilglow)"/>`;
       g += `<polygon points="${pts} ${P(cx + tw / 2 + 8)},${top + 6}" fill="${c.stone}"/>`;
       g += `<path d="M${P(cx - tw / 2)},${top + 14} Q${P(cx - tw / 2 - w * .7)},${P(top - h * .02)} ${P(cx - tw / 2 - w * .55)},${P(top - h * .2)} Q${P(cx - tw / 2 - w * .35)},${P(top - h * .02)} ${P(cx - tw / 2 + 2)},${top + 30} Z" fill="${c.stone}"/>`;
       g += `<path d="M${P(cx + tw / 2)},${top + 14} Q${P(cx + tw / 2 + w * .7)},${P(top - h * .02)} ${P(cx + tw / 2 + w * .55)},${P(top - h * .2)} Q${P(cx + tw / 2 + w * .35)},${P(top - h * .02)} ${P(cx + tw / 2 - 2)},${top + 30} Z" fill="${c.shade}"/>`;
@@ -126,8 +128,9 @@ export function darkCitadel(x, y, s, c) {
 
 // ბნელი ციტადელის მეორე ტიპი: ობსიდიანის საფეხურებიანი პირამიდა (ზიკურატი) ლავის ღარით და ცეცხლით თავზე
 export function obsidianZiggurat(x, y, s, c) {
-  const flame = (fx, fy, k) => `<circle cx="${fx}" cy="${fy - 8}" r="${22 * k}" fill="url(#${c.id}-glow)" class="flicker"/>` +
-    `<path d="M${fx - 7 * k},${fy} Q${fx - 9 * k},${fy - 14 * k} ${fx},${fy - 28 * k} Q${fx + 9 * k},${fy - 14 * k} ${fx + 7 * k},${fy} Z" fill="#ff8a2a" class="flicker"/>`;
+  const tf = `<g transform="translate(${x},${y}) scale(${s})">`;
+  const flame = (fx, fy, k) => `<circle cx="${fx}" cy="${fy - 8}" r="${22 * k}" fill="url(#${c.id}-glow)"/>` +   // ნათება უძრავია, ალი — მოძრავ ფენაში
+    anim(`<path d="M${fx - 7 * k},${fy} Q${fx - 9 * k},${fy - 14 * k} ${fx},${fy - 28 * k} Q${fx + 9 * k},${fy - 14 * k} ${fx + 7 * k},${fy} Z" fill="#ff8a2a" class="flicker"/>`, tf);
   let g = `<polygon points="-290,14 -250,-14 250,-14 290,14" fill="${c.rock}"/>`;
   const tiers = [[440, 0], [340, -70], [240, -140], [140, -210]];
   for (const [w, base] of tiers) {
@@ -145,10 +148,10 @@ export function obsidianZiggurat(x, y, s, c) {
   // სალოცავი რქებით და უზარმაზარი ცეცხლი თავზე
   g += `<rect x="-40" y="-340" width="80" height="62" fill="${c.stone}"/><rect x="8" y="-340" width="32" height="62" fill="${c.shade}"/>`;
   g += `<path d="M-40,-334 Q-80,-370 -66,-420 Q-58,-376 -30,-352 Z M40,-334 Q80,-370 66,-420 Q58,-376 30,-352 Z" fill="${c.stone}"/>`;
-  g += `<circle cx="0" cy="-380" r="90" fill="url(#${c.id}-evilglow)" class="pulse"/>` + flame(0, -340, 2.6);
+  g += `<circle cx="0" cy="-380" r="90" fill="url(#${c.id}-evilglow)"/>` + flame(0, -340, 2.6);
   // კარიბჭე ძირში
   g += `<circle cx="0" cy="-30" r="60" fill="url(#${c.id}-evilglow)"/><path d="M-30,0 V-44 L0,-66 L30,-44 V0 Z" fill="#12080a"/><path d="M-20,0 V-46 M0,0 V-60 M20,0 V-46" stroke="${c.win}" stroke-width="2.4" opacity=".6"/>`;
-  return `<g transform="translate(${x},${y}) scale(${s})">${g}</g>`;
+  return tf + g + '</g>';
 }
 
 export const EVIL = { stone: '#2c2230', shade: '#1a141e', rim: '#d0502a', rock: '#1c1418', win: '#ff6a2a' };

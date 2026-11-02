@@ -8,27 +8,15 @@
       <span class="hero__lead-2" data-i18n="hero.lead2"></span>
     </p>
 
-    <!-- ტელეფონზე: კაფსულა დროშებით და გეოგრაფიით (დაჭერისას — მინიშნება), იხ. hero.js -->
-    <div class="hero__mobile-teach" data-list="mobileTeach"></div>
-
-    <!-- რას ვასწავლით: საგნები, გეოგრაფია, თამაშის რეჟიმები, სწავლების ენები (სიებს ავსებს hero.js) -->
-    <div class="hero__card">
-      <div class="hero__row hero__row--subjects">
-        <div class="hero__label"><span class="hero__icon" data-icon="book"></span><b data-i18n="hero.subjectsLabel"></b></div>
-        <div class="hero__items" data-list="subjects"></div>
-      </div>
-      <div class="hero__row hero__row--geography">
-        <div class="hero__label"><span class="hero__icon" data-icon="map"></span><b data-i18n="hero.geographyLabel"></b></div>
-        <div class="hero__items" data-list="geography"></div>
-      </div>
-      <div class="hero__row hero__row--modes">
-        <div class="hero__label"><span class="hero__icon" data-icon="swords"></span><b data-i18n="hero.modesLabel"></b></div>
-        <div class="hero__items" data-list="modes"></div>
-      </div>
-      <div class="hero__row hero__row--languages">
-        <div class="hero__label"><span class="hero__icon" data-icon="globe"></span><b data-i18n="hero.languagesLabel"></b></div>
-        <div class="hero__items" data-list="languages"></div>
-      </div>
+    <!-- ერთი მინისებრი პანელი სამი რიგით (ოქროს გამყოფებით): „რას ვასწავლით“, „რა ენაზე ვასწავლით“, „როგორ ითამაშებ“.
+         კომპიუტერზე — .teach (ორი პირველი რიგი); ტელეფონზე — .hero__mobile-teach (დროშების კაფსულა) და .hero__mobile-langs (ენები).
+         სიებს ავსებს hero.js -->
+    <div class="info-panel">
+      <div class="hero__mobile-teach" data-list="mobileTeach" data-tips></div>
+      <div class="teach" data-list="teach" data-tips></div>
+      <div class="hero__mobile-langs" data-list="mobileLangs"></div>
+      <div class="hero__modes-label" data-list="modesLabel"></div>
+      <div class="hero__modes" data-list="modes"></div>
     </div>
 
     <div class="hero__chips" data-list="chips"></div>

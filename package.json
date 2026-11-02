@@ -8,6 +8,6 @@
     "dev": "node tools/dev-server.mjs"
   },
   "engines": {
-    "node": ">=20.11"
+    "node": ">=18"
   }
 }
