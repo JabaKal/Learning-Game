@@ -1,5 +1,5 @@
 /* ფონის სცენა: მთელ ეკრანზე, ყველაფრის უკან */
-.scene { position: fixed; inset: 0; overflow: hidden; }
+.scene { position: fixed; inset: 0; overflow: hidden; contain: strict; }   /* ნახატი იზოლირებულია: ტექსტის ცვლილება მას თავიდან არ ხატავს */
 .scene__svg { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; }
 
 /* ნახატის შიგნით მოძრავი ნაწილები (კლასებს ანიჭებს draw/*.js) */

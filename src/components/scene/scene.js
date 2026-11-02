@@ -17,9 +17,13 @@ export function init(root) {
   root.style.background = THEME.sky;
   svg.innerHTML = drawScene('bg');
 
+  // ნახატში ~15 000 ელემენტია: viewBox-ის ყოველი ჩაწერა მთელ ნახატს თავიდან ხატავს (წამამდე ნელ ტელეფონზე),
+  // ამიტომ ვწერთ მხოლოდ მაშინ, როცა მართლა შეიცვალა (მაგ. ენის შეცვლისას კომპიუტერზე — არასდროს)
+  const setViewBox = value => { if (svg.getAttribute('viewBox') !== value) svg.setAttribute('viewBox', value); };
+
   const fit = () => {
     if (!MOBILE.matches) {
-      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      setViewBox(`0 0 ${W} ${H}`);
       const pt = new DOMPoint(...DESKTOP_START).matrixTransform(svg.getScreenCTM());
       return set('startButton', { x: pt.x, y: Math.min(innerHeight - 46, pt.y) });
     }
@@ -29,7 +33,7 @@ export function init(root) {
     // დაბალ ეკრანზე სცენა პატარავდება, მაგრამ არა იმდენად, რომ ნახატის გვერდითი კიდეები გამოჩნდეს (სიგანე ≤ 1300)
     const k = Math.max(innerWidth / 1300, Math.min(innerWidth / FOCUS_WIDTH, (innerHeight - textBottom) / need));
     const w = innerWidth / k, h = innerHeight / k, top = SWORD_TOP - textBottom / k;
-    svg.setAttribute('viewBox', `${SPLIT - w / 2} ${top} ${w} ${h}`);
+    setViewBox([SPLIT - w / 2, top, w, h].map(n => Math.round(n)).join(' '));   // მთელი რიცხვები — წვრილმანი ცვლილება არ ითვლება
     // ღილაკი ბილიკზე: ჯარების შეერთებასა და ეკრანის ქვედა კიდეს შორის
     const forkPx = (FORK_Y + 70 - top) * k;
     set('startButton', { x: innerWidth / 2, y: Math.min(innerHeight - 46, forkPx + (innerHeight - forkPx) * .55) });

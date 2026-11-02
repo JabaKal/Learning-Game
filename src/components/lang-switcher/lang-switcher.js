@@ -39,8 +39,11 @@ export function init(root) {
   menu.addEventListener('click', e => {
     e.stopPropagation();
     const item = e.target.closest('[data-code]');
-    if (item) set('lang', item.dataset.code);
     toggle(false);                                   // ენის არჩევა ან ზედა ზოლზე დაჭერა კეცავს სიას
+    if (!item) return;
+    // ✓ მაშინვე გადადის არჩეულ ენაზე; თავად ენა იცვლება დაკეცვის ანიმაციის შემდეგ, რომ გვერდის თარგმნამ ანიმაცია არ გააჭედოს
+    items.forEach(b => b.classList.toggle('lang__item--on', b === item));
+    setTimeout(() => set('lang', item.dataset.code), 280);
   });
   document.addEventListener('click', () => toggle(false));
   addEventListener('keydown', e => { if (e.key === 'Escape') toggle(false); });
