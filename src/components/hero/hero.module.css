@@ -119,8 +119,8 @@
 .teach--capsule .teach-capsule__item { height: 38px; padding: 0 7px; gap: 6px; }
 .teach--capsule .teach-capsule__item .hero__flag { width: 22px; height: 15px; }
 .teach--capsule .teach-capsule__item .hero__globe { width: 18px; height: 18px; }
-/* ვიწრო კომპიუტერზე კაფსულაში მხოლოდ დროშები და „გეოგრაფია“ რჩება (ენის სახელი მიტანისას ბუშტში ჩანს), რომ ერთ ხაზზე ეტეოდეს */
-@media (min-width: 761px) and (max-width: 1420px) {
+/* ≤ 1600px კომპიუტერზე კაფსულაში მხოლოდ დროშები და „გეოგრაფია“ რჩება (ენის სახელი მიტანისას ბუშტში ჩანს) — პანელის შიგნით სახელებით ერთ ხაზზე აღარ ეტევა */
+@media (min-width: 761px) and (max-width: 1600px) {
   .teach--capsule .teach-capsule__item:not(.teach-capsule__item--geo) .teach-capsule__name { display: none; }
 }
 
@@ -223,7 +223,9 @@
   }
   .info-panel .teach { margin-top: 0; max-width: none; }
   .info-panel .teach-capsule, .info-panel .teach__langs { background: none; border: 0; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
-  .info-panel .teach-capsule { padding: 0; margin-left: -7px; }
+  .info-panel .teach-capsule { padding: 0; margin-left: -6px; gap: 0; }
+  .info-panel .teach-capsule__item { padding: 0 6px; gap: 6px; }           /* მჭიდროდ — ხუთივე სახელით პანელში (604px) ერთ ხაზზე ეტევა */
+  .info-panel .teach-capsule > i { margin: 0 3px; }
   .info-panel .teach__langs { padding: 0; margin-left: -6px; }
   /* რიგებს შორის — ერთნაირი დაშორება და ოქროს გამყოფი, რომელიც მარჯვნივ ქრება */
   .info-panel .teach__main + .teach__label, .info-panel .hero__modes-label {
@@ -380,4 +382,12 @@
 /* სომხურში „Աշխარհագրություն“ ტელეფონის კაფსულაში ცალკე ხაზზე ჩადის — დროშების შემდეგ მარტო დარჩენილი გამყოფი იმალება */
 @media (max-width: 760px) {
   html:lang(hy) .info-panel .teach-capsule > i { display: none; }
+}
+
+/* ფართო კომპიუტერი (> 1600px): პანელი ოდნავ განიერია, რომ დროშები ენების სახელებით ერთ ხაზზე დაეტიოს ყველა ენაზე
+   (ყველაზე გრძელია სომხური); ხმალს მაინც არ ეხება */
+@media (min-width: 1601px) {
+  .hero__inner { max-width: 712px; }
+  .info-panel { width: 712px; max-width: 100%; }        /* ფიქსირებული სიგანე — მოკლე ტექსტის ენაზეც (რუსული) ერთნაირია და სახელები ეტევა */
+  .info-panel .teach-capsule__name { font-size: 12.5px; }
 }

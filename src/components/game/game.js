@@ -10,14 +10,17 @@
 import { on, set } from '../../core/state.js';
 import { t } from '../../core/i18n.js';
 import { getPref, setPref } from '../../core/prefs.js';
-import { drawGround, drawOverlay, drawLights, LAYOUTS, NO_LABEL } from './kingdom-map.js';
+import { drawGround, drawOverlay, drawLights, LAYOUTS, NO_LABEL, READY } from './kingdom-map.js';
+import { ART } from './map-art.js';
 
 const MAX_PIXELS = 8e6;            // მიწის სურათის ზედა ზღვარი (≈32 MB) — დიდ ეკრანზე სიმკვეთრე ოდნავ იკლებს, მეხსიერება არა
 
 export function init(root) {
   const view = root.querySelector('.game__view'), ground = root.querySelector('.game__ground'), map = root.querySelector('.game__map');
   const lights = root.querySelector('.game__lights'), mode = root.querySelector('.game__mode');
-  const toast = root.querySelector('.game__toast'), nav = root.querySelector('.game__nav');
+  const toast = root.querySelector('.game__toast'), nav = root.querySelector('.game__nav'), art = root.querySelector('.game__art'), back = root.querySelector('.game__art-back');
+  let artKey = null;                     // რომელი სურათი ჩანს (map-art.js); null — კოდით დახატული რუკა
+  const spotLabels = () => (artKey ? ART[artKey].labels : layout?.labels) || {};
   let drawn = false, layout = null, k = 0, toastTimer = null, groundTimer = null;
 
   // მიწის ფენა: ხილული ნაწილი იხატება ეკრანის ზომის სურათად (მკვეთრად, ეკრანის სიმკვრივით)
@@ -35,15 +38,78 @@ export function init(root) {
   };
 
   // განლაგება ეკრანის ფორმით; focus მთლიანად ეტევა ზედა ზოლსა და ქვედა მენიუს (ტელეფონზე — ეკრანის ქვედა კიდეს) შორის, შუაში
+  // რუკა სურათად: სურათი ფარავს ეკრანს (cover), შენობები — სურათის პროცენტებით, ამიტომ ყოველთვის თავის ადგილზეა
+  const fitArt = key => {
+    const A = ART[key], w = view.clientWidth, h = view.clientHeight;
+    if (artKey !== key) {
+      artKey = key;
+      const set = A.srcset ? ` srcset="${A.srcset.map(([u, w]) => `${u} ${w}w`).join(', ')}" sizes="100vw"` : '';
+      art.innerHTML = `<img class="game__art-img game__art-day" src="${A.src}"${set} alt="" decoding="async" draggable="false">` +
+        (A.night ? `<img class="game__art-img game__art-night" src="${A.night}" alt="" draggable="false">` : '') +
+        Object.entries(A.spots).map(([id, [x0, y0, x1, y1]]) =>
+          `<button type="button" class="art-spot${READY.has(id) ? '' : ' is-locked'}" data-spot="${id}" style="left:${(x0 / A.w * 100).toFixed(2)}%;top:${(y0 / A.h * 100).toFixed(2)}%;width:${((x1 - x0) / A.w * 100).toFixed(2)}%;height:${((y1 - y0) / A.h * 100).toFixed(2)}%">` +
+          `<span class="art-spot__label"><b class="art-spot__name"></b><small class="art-spot__soon"></small></span></button>`).join('');
+      artLabels();
+      art.querySelector('.game__art-day').addEventListener('error', () => { A.broken = true; artKey = null; fit(); }, { once: true });
+    }
+    // contain — მთელი სურათი ეკრანზე ეტევა (არაფერი იჭრება), ცარიელ ზოლებს ავსებს იგივე სურათის ბუნდოვანი ასლი (.game__art-back);
+    // cover — სურათი ფარავს ეკრანს, ეკრანის ფორმის მიხედვით კიდეები იჭრება
+    const k = (A.fit === 'contain' ? Math.min : Math.max)(w / A.w, h / A.h), bw = A.w * k, bh = A.h * k;
+    // ბუნდოვანი ფონი — იგივე ფაილი, რაც ბრაუზერმა სურათისთვის აირჩია (მეორე ჩამოტვირთვა არ ხდება)
+    // ცარიელი ზოლები: სურათის სარკისებრი ანარეკლი ყოველ მხარეს (+ ასლი სურათის ქვეშ — მის რბილ კიდეს ქვემოდან ავსებს) (როგორც წყალში) — ნაკერთან ფერები ზუსტად ემთხვევა, ხაზი არ ჩანს.
+    // იგივე ფაილი, რაც ბრაუზერმა სურათისთვის აირჩია (მეორე ჩამოტვირთვა არ ხდება)
+    const day = art.querySelector('.game__art-day'), x0 = (w - bw) * A.ax, y0 = (h - bh) * A.ay;
+    const useBack = () => {
+      if (A.fit !== 'contain' || !day?.currentSrc) { back.innerHTML = ''; return; }
+      let tiles = '';
+      for (const dy of [-1, 0, 1]) for (const dx of [-1, 0, 1]) {
+        const l = x0 + dx * bw, tp = y0 + dy * bh;
+        if (l >= w || l + bw <= 0 || tp >= h || tp + bh <= 0) continue;          // ეკრანის გარეთ — არ გვჭირდება
+        tiles += `<img src="${day.currentSrc}" alt="" style="left:${l.toFixed(1)}px;top:${tp.toFixed(1)}px;width:${bw.toFixed(1)}px;height:${bh.toFixed(1)}px;transform:scale(${dx ? -1 : 1},${dy ? -1 : 1})">`;
+      }
+      back.innerHTML = tiles;
+    };
+    if (day && !day.complete) day.addEventListener('load', useBack, { once: true }); else useBack();
+    art.style.cssText = `width:${bw.toFixed(1)}px;height:${bh.toFixed(1)}px;left:${((w - bw) * A.ax).toFixed(1)}px;top:${((h - bh) * A.ay).toFixed(1)}px`;
+    art.querySelector('.game__art-day')?.setAttribute('sizes', `${Math.ceil(bw)}px`);   // ბრაუზერი ირჩევს srcset-იდან საკმარისად დიდ, მაგრამ არა ზედმეტ ზომას
+    keepLabelsIn();
+  };
+  // ეკრანის ფორმის გამო სურათის კიდე შეიძლება მოიჭრას — კიდესთან მდგარი შენობის წარწერა ეკრანის შიგნით გადმოიწევს
+  const keepLabelsIn = () => {
+    const top = root.querySelector('.game__bar').offsetHeight, bottom = view.clientHeight - 8, right = view.clientWidth - 8;
+    for (const l of art.querySelectorAll('.art-spot__label')) {
+      l.style.translate = '';
+      const r = l.getBoundingClientRect(), v = view.getBoundingClientRect();
+      const dx = Math.max(0, 8 - (r.left - v.left)) - Math.max(0, r.right - v.left - right);
+      const dy = Math.max(0, top - (r.top - v.top)) - Math.max(0, r.bottom - v.top - bottom);
+      if (dx || dy) l.style.translate = `${Math.round(dx)}px ${Math.round(dy)}px`;
+    }
+  };
+  const artLabels = () => {
+    if (!artKey) return;
+    for (const b of art.querySelectorAll('.art-spot')) {
+      const id = b.dataset.spot, name = t(`game.spots.${spotLabels()[id] || id}`), ready = READY.has(id);
+      b.querySelector('.art-spot__name').textContent = name;
+      b.querySelector('.art-spot__soon').textContent = ready ? '' : `🔒 ${t('game.soon')}`;
+      b.setAttribute('aria-label', ready ? name : `${name} — ${t('game.soon')}`);
+    }
+  };
+
   const fit = () => {
     const w = view.clientWidth, h = view.clientHeight;
     if (!w || !h) return;
-    const next = LAYOUTS[w / h < 1 ? 'tall' : 'wide'];
+    const key = w / h < 1 ? 'tall' : 'wide';
+    const useArt = !!ART[key] && !ART[key].broken;          // სურათი ვერ ჩაიტვირთა (ფაილი აკლია) — კოდით დახატული რუკა
+    root.classList.toggle('game--art', useArt);
+    if (useArt) { root.classList.toggle('game--tall', key === 'tall'); return fitArt(key); }
+    artKey = null; art.innerHTML = '';
+    const next = LAYOUTS[key];
     root.classList.toggle('game--tall', next === LAYOUTS.tall);
     if (next !== layout) { layout = next; map.innerHTML = drawOverlay('km', layout); lights.innerHTML = drawLights('kl', layout); ground.width = 0; }
     const F = layout.focus, top = root.querySelector('.game__bar').offsetHeight + 4;
     const bottom = getComputedStyle(nav).display === 'none' ? 10 : h - nav.getBoundingClientRect().top + 10;
     const room = h - top - bottom;
+    if (room <= 0) return;                               // ეკრანი ჯერ არ არის საბოლოო ზომის (მაგ. ჩატვირთვისას) — თორემ viewBox უარყოფითი გამოდის
     k = Math.min((w - 16) / F.w, room / F.h);
     const area = { x: F.x + F.w / 2 - w / 2 / k, y: F.y + F.h / 2 - (top + room / 2) / k, w: w / k, h: h / k };
     const box = `${area.x.toFixed(1)} ${area.y.toFixed(1)} ${area.w.toFixed(1)} ${area.h.toFixed(1)}`;
@@ -87,11 +153,12 @@ export function init(root) {
 
   const useSpot = id => {
     if (id === 'geography') return set('quizOpen', true);           // დროშების ტესტი — გეოგრაფია
-    if (id === 'castle') return say(t(layout.labels?.castle === 'profile' ? 'game.profileSoon' : 'game.castleText'));
-    say(`${t(`game.spots.${layout.labels?.[id] || id}`)} — ${t('game.soonText')}`);
+    if (id === 'castle') return say(t(spotLabels().castle === 'profile' ? 'game.profileSoon' : 'game.castleText'));
+    say(`${t(`game.spots.${spotLabels()[id] || id}`)} — ${t('game.soonText')}`);
   };
 
   map.addEventListener('click', e => { const spot = e.target.closest('.spot'); if (spot) useSpot(spot.dataset.spot); });
+  art.addEventListener('click', e => { const spot = e.target.closest('.art-spot'); if (spot) useSpot(spot.dataset.spot); });
   map.addEventListener('keydown', e => {
     const spot = e.target.closest('.spot');
     if (spot && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); useSpot(spot.dataset.spot); }
@@ -127,7 +194,7 @@ export function init(root) {
   // რუკა წინასწარ, როცა ბრაუზერი თავისუფალია — რომ „დაიწყე“-ზე ხატვამ გადასვლა არ შეაფერხოს
   (window.requestIdleCallback || (fn => setTimeout(fn, 1500)))(draw, { timeout: 3000 });
   on('gold', gold => { root.querySelector('.game__gold-n').textContent = gold; });
-  on('lang', () => { labels(); setNight(root.classList.contains('game--night')); });
+  on('lang', () => { labels(); artLabels(); keepLabelsIn(); setNight(root.classList.contains('game--night')); });
   // წარწერის სიგანე — ნამდვილი შრიფტით (ახალი ენის შრიფტი შეიძლება მოგვიანებით ჩაიტვირთოს, მაგ. სომხური)
   document.fonts?.ready.then(labels);
   document.fonts?.addEventListener?.('loadingdone', labels);

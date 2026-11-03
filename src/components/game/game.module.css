@@ -17,6 +17,15 @@ html[data-switch="out"] .game { animation: game-out .45s cubic-bezier(.55, .05, 
 
 /* ღამე (.game--night): მიწა და შენობები ბნელდება და ცისფრდება, ინთება შუქები, ჩნდება ვარსკვლავები */
 .game__ground, .game__map { transition: filter 1.3s cubic-bezier(.45, 0, .25, 1); }
+.game__ground { filter: saturate(1.12) contrast(1.06); }          /* „ნახატის“ გაჯერებული ფერები (რეფერენსი) */
+/* თბილი მზის შუქი ზედა მარჯვენა კუთხიდან და რბილი ვინიეტი კიდეებზე — რუკა „ნახატივით“ განათებულია; ღამით — სუსტად */
+.game__view::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 1; transition: opacity 1.3s ease;
+  background: radial-gradient(ellipse 80% 60% at 85% -5%, rgba(255, 210, 130, .38), rgba(255, 210, 130, 0) 70%),
+    radial-gradient(ellipse 60% 40% at 10% 100%, rgba(255, 190, 110, .14), rgba(255, 190, 110, 0) 70%),
+    radial-gradient(ellipse 85% 75% at 50% 50%, rgba(0, 0, 0, 0) 55%, rgba(6, 20, 10, .5) 100%);
+}
+.game--night .game__view::after { opacity: .6; }
 .game--night .game__ground { filter: brightness(.38) saturate(.75) hue-rotate(12deg); }
 .game--night .game__map { filter: brightness(.6) saturate(.8); }
 .game__lights { pointer-events: none; opacity: 0; mix-blend-mode: screen; transition: opacity .5s ease; }
@@ -31,7 +40,11 @@ html[data-switch="out"] .game { animation: game-out .45s cubic-bezier(.55, .05, 
     radial-gradient(1px 1px at 72% 38%, #fff 50%, transparent 51%), linear-gradient(180deg, rgba(10, 14, 48, .55), transparent);
 }
 .game--night .game__sky { opacity: 1; }
-.game__skyback { position: absolute; inset: 0; z-index: 0; background: linear-gradient(180deg, #8fc6e8 0%, #dcedf2 22%); }
+/* ცა ღრუბლებით (რეფერენსი): ზემოთ მდიდარი ლურჯი, ჰორიზონტთან ღია; რბილი თეთრი ღრუბლები */
+.game__skyback { position: absolute; inset: 0; z-index: 0;
+  background: radial-gradient(ellipse 18% 4% at 22% 6%, rgba(255, 255, 255, .95), transparent), radial-gradient(ellipse 14% 3% at 30% 8%, rgba(255, 255, 255, .8), transparent),
+    radial-gradient(ellipse 20% 4% at 72% 5%, rgba(255, 255, 255, .9), transparent), radial-gradient(ellipse 12% 3% at 82% 8%, rgba(255, 255, 255, .75), transparent),
+    linear-gradient(180deg, #4f9ee0 0%, #9fd0f0 12%, #e2f1f8 22%); }
 .game__skyback::after { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 1.3s ease; background: linear-gradient(180deg, #060920 0%, #161c46 22%); }
 .game--night .game__skyback::after { opacity: 1; }
 
@@ -122,3 +135,41 @@ html[data-screen="game"]:not([data-switch]) .game__fx .flag { animation: game-wa
   .game__guest { padding: 0 10px; }
   .game__toast { font-size: 13px; }
 }
+
+/* ---------- რუკა სურათად (map-art.js) ---------- */
+.game__art { position: absolute; display: none; }
+/* ცარიელი ზოლები — სურათის სარკისებრი ანარეკლი (game.js), ოდნავ ბუნდოვანი და მკრთალი, რომ მთავარი სურათი გამოირჩეოდეს */
+.game__art-back { position: absolute; inset: 0; display: none; overflow: hidden; filter: blur(6px) brightness(.82) saturate(.95); transition: filter 1.3s ease; }
+.game__art-back img { position: absolute; display: block; max-width: none; user-select: none; -webkit-user-drag: none; }
+.game--art .game__art-back { display: block; }
+.game--night .game__art-back { filter: blur(6px) brightness(.36) saturate(.65) hue-rotate(15deg); }
+/* სურათის კიდეები რბილად ქრება ბუნდოვან ფონში (იგივე სურათია) — მკვეთრი ხაზი არ ჩანს */
+.game__art-img {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent), linear-gradient(transparent, #000 5%, #000 95%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent), linear-gradient(transparent, #000 5%, #000 95%, transparent);
+  mask-composite: intersect;
+}
+.game--art .game__art { display: block; }
+.game--art .game__ground, .game--art .game__map, .game--art .game__lights, .game--art .game__sky { display: none; }
+.game__art-img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; user-select: none; -webkit-user-drag: none;
+  filter: saturate(1.05); transition: filter 1.3s cubic-bezier(.45, 0, .25, 1), opacity 1.3s ease; }
+.game--night .game__art-img { filter: brightness(.42) saturate(.7) hue-rotate(15deg); }
+.game__art-night { opacity: 0; filter: none; }
+.game--night .game__art-night { opacity: 1; filter: none; }
+/* შენობა: მთელი არე დასაჭერია; მიტანისას — რბილი ოქროს ნათება; წარწერა ქვედა კიდეზე */
+.art-spot { position: absolute; padding: 0; border: 0; border-radius: 30%; background: none; cursor: pointer; touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent; transition: background .2s, box-shadow .2s; }
+.art-spot:hover, .art-spot:focus-visible { background: radial-gradient(closest-side, rgba(255, 226, 150, .28), rgba(255, 226, 150, 0)); outline: none; }
+.art-spot__label {
+  position: absolute; left: 50%; top: 100%; transform: translate(-50%, -55%); display: grid; justify-items: center; gap: 1px; pointer-events: none;
+}
+.art-spot__name {
+  padding: 4px 14px; border-radius: 999px; white-space: nowrap; font: 800 14px var(--font-sans); color: #ffe7b8;
+  background: rgba(20, 12, 40, .82); border: 1.5px solid rgba(242, 181, 74, .7); box-shadow: 0 4px 12px rgba(0, 0, 0, .35);
+  transition: transform .18s, border-color .18s;
+}
+.art-spot:hover .art-spot__name, .art-spot:focus-visible .art-spot__name { transform: translateY(-2px); border-color: var(--gold-light); }
+.art-spot.is-locked .art-spot__name { color: #ece4d4; border-color: rgba(255, 255, 255, .35); }
+.art-spot__soon { font: 700 12px var(--font-sans); color: #fff; text-shadow: 0 1px 3px rgba(0, 0, 0, .9), 0 0 6px rgba(0, 0, 0, .6); }
+.art-spot__soon:empty { display: none; }

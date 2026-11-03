@@ -110,13 +110,30 @@ function desktop(T) {
 const TALL = phone();
 export const LAYOUTS = { wide: desktop(TALL), tall: TALL };
 
+// ფერები — ავტორის რეფერენსით (2026-11-04, „ნახატის“ სტილის რუკა): ღრმა, გაჯერებული მწვანე, მდიდარი ლურჯი ზღვა ფირუზისფერი
+// მეჩეჩით და კლდოვანი ნაპირით, თბილი ბეჟი-ნაცრისფერი ქვის გალავანი წითელი ბაირაღებით, თოვლიანი ლურჯი მთები
 const C = {
-  sky: '#8fc6e8', sky2: '#dcedf2', sea: '#2b8fb0', sea2: '#1d6688', foam: '#e6f7ff', sand: '#e9d49a', grass: '#5cae4c', meadow: '#7cc663', dark: '#3f8f3e',
-  river: '#3aa6c6', riverEdge: '#2a7f99', curb: '#8a8172', curbLight: '#a39a88', joint: '#6e665a', paving: '#c9bfac', paving2: '#bfb4a0',
-  tree: ['#2a8a45', '#1d6e36'], oak: ['#4aa547', '#36863a'],
-  wallTop: '#f4f3ef', wallFace: '#e6e4de', wallDark: '#a19d93', wallLine: '#d3d0c8'      // თეთრი ქვა (ავტორის რეფერენსი)
+  sky: '#5fa8e2', sky2: '#d8ecf7', sea: '#2585cf', sea2: '#0f4a92', shallow: '#3fbfd2', foam: '#f2fbff', sand: '#dcc48d', rock: '#8a8274', rockLight: '#b9b09d',
+  grass: '#43902f', meadow: '#74b347', dark: '#2a6526',
+  river: '#2f8fd0', riverEdge: '#1f6aa8', curb: '#857c6c', curbLight: '#a69c88', joint: '#6a6255', paving: '#cfc4ad', paving2: '#c3b79f',
+  tree: ['#1f6d33', '#124a22'], oak: ['#3d8f37', '#2a6a28'],
+  wallTop: '#e9dfc6', wallFace: '#d6c8a8', wallDark: '#8c7c62', wallLine: '#c1b08e',      // თბილი ბეჟი ქვა (რეფერენსი)
+  banner: '#b51f2a', bannerDark: '#7e1219'
 };
-const FIELD_COLORS = ['#e2c55a', '#b9cf5e', '#d4a94c', '#c9d466'];
+const FIELD_COLORS = ['#e8c24a', '#d9b04a', '#c9d466', '#e3a83f'];
+
+// წითელი ბაირაღი თეთრი ჯვრით, ჩამოკიდებული კედელზე / კოშკზე (რეფერენსის მსგავსად): x, y — ზედა შუა წერტილი, w — სიგანე, len — სიგრძე
+const hangBanner = (x, y, w, len) => {
+  const hw = w / 2, cy = y + len * .42;
+  return `<g><rect x="${P(x - hw - 2)}" y="${P(y - 3)}" width="${P(w + 4)}" height="3" rx="1.5" fill="#5a3a20"/>` +
+    `<path d="M${P(x - hw)},${P(y)} H${P(x + hw)} V${P(y + len)} L${P(x)},${P(y + len - w * .45)} L${P(x - hw)},${P(y + len)} Z" fill="${C.banner}"/>` +
+    `<path d="M${P(x + hw * .35)},${P(y)} H${P(x + hw)} V${P(y + len)} L${P(x + hw * .35)},${P(y + len - w * .2)} Z" fill="${C.bannerDark}" opacity=".55"/>` +
+    `<path d="M${P(x)},${P(cy - w * .42)} V${P(cy + w * .42)} M${P(x - w * .3)},${P(cy - w * .08)} H${P(x + w * .3)}" stroke="#f4ecdc" stroke-width="${P(w * .16)}" stroke-linecap="round"/></g>`;
+};
+// ბაირაღები გალავნის გასწვრივ (კოშკებს და კარიბჭეს შორის), კედლის პირზე, სავლის ქვემოთ
+const wallBanners = (pts, up, h, skip, step = 150) => spaced(pts, step).slice(1)
+  .filter(([x, y]) => !skip.some(([sx, sy]) => Math.hypot(sx - x, sy - y) < 70))
+  .map(([x, y]) => hangBanner(x + up[0] * (h - 10), y + up[1] * (h - 10), 15, h * .5)).join('');
 
 const sample = (segs, n) => segs.flatMap(s => Array.from({ length: n }, (_, i) => bez(s, i / n)));
 const near = (pts, x, y, r) => pts.some(([px, py]) => (px - x) ** 2 + (py - y) ** 2 < r * r);
@@ -244,8 +261,8 @@ function planOf(L) {
   }
   // ტყე: ბადე შემთხვევითი წანაცვლებით — სადაც თავისუფალია
   const trees = [], ext = L.ext;
-  for (let y = L.horizon; y < ext.y + ext.h; y += 30) for (let x = ext.x; x < ext.x + ext.w; x += 34) {
-    const tx = x + (r() - .5) * 24, ty = y + (r() - .5) * 18;
+  for (let y = L.horizon; y < ext.y + ext.h; y += 25) for (let x = ext.x; x < ext.x + ext.w; x += 27) {
+    const tx = x + (r() - .5) * 20, ty = y + (r() - .5) * 15;
     if (!free(tx, ty, 6) || houses.some(h => Math.hypot(h[0] - tx, h[1] - ty) < 26)) continue;
     trees.push([tx, ty, .42 + r() * .14, r() < .35]);
   }
@@ -342,11 +359,45 @@ function wallBand(pts, up, h, thick = 40, o = {}) {
   if (o.guardsAt) g += o.guardsAt.map(([x, y], i) => soldier(x + up[0] * h + dv[0] * thick * .55, y + up[1] * h + dv[1] * thick * .55, i % 2 ? '#2f6fc0' : '#c8392b')).join('');
   // ქვის პირი რიგებით
   g += `<path d="${poly(pts, top)}" fill="${C.wallFace}" stroke="${C.wallDark}" stroke-width="1.6" stroke-linejoin="round"/>`;
-  for (const f of [.2, .4, .6, .8]) g += `<path d="${line(shift(pts, up, h * f))}" fill="none" stroke="${C.wallLine}" stroke-width="1.3" stroke-dasharray="${f === .4 || f === .8 ? '16 3' : '10 3'}"/>`;
-  g += `<path d="${line(shift(pts, up, 6))}" fill="none" stroke="${C.wallDark}" stroke-width="6" stroke-opacity=".35"/>`;            // ძირის ჩრდილი
+  g += masonry(pts, up, h, o.blockW || 22);
+  g += `<path d="${line(shift(pts, up, h * .14))}" fill="none" stroke="#3a2e1e" stroke-width="${P(h * .28)}" stroke-opacity=".16"/>` +    // ქვედა ნაწილი — ჩრდილში
+    `<path d="${line(shift(pts, up, 5))}" fill="none" stroke="${C.wallDark}" stroke-width="8" stroke-opacity=".4"/>` +             // ძირის ჩრდილი
+    `<path d="${line(shift(pts, up, h - 3))}" fill="none" stroke="#fff8e6" stroke-width="4" stroke-opacity=".35"/>`;               // ზედა კიდე — მზეზე
+  if (!o.noRocks) g += rocks(pts, o.rockStep || 70);
   // წინა პარაპეტი კბილანებით (კედლის პირის გაგრძელება)
   return g + merlons(top, C.wallFace, C.wallDark);
 }
+// ქვის წყობა: ჰორიზონტალური რიგები, ყოველ რიგში ნაკერები წანაცვლებით (როგორც ნამდვილ კედელში), ზოგიერთი ქვა მუქი / ნათელი
+function masonry(pts, up, h, bw = 22) {
+  const rows = Math.max(4, Math.round(h / 12)), rh = h / rows, r = rng(Math.round(Math.abs(pts[0][0] * 7 + pts[0][1] * 3)) + 1);
+  let lines = '', joints = '', tint = '';
+  for (let i = 1; i < rows; i++) lines += line(shift(pts, up, rh * i)) + ' ';
+  for (let i = 0; i < rows; i++) {
+    const row = spaced(shift(pts, up, rh * (i + .5)), bw), off = i % 2 ? .5 : 0;
+    for (let k = 0; k + 1 < row.length; k++) {
+      const [ax, ay] = row[k], [bx, by] = row[k + 1], jx = ax + (bx - ax) * off, jy = ay + (by - ay) * off;
+      joints += `M${P(jx - up[0] * rh / 2)},${P(jy - up[1] * rh / 2)} L${P(jx + up[0] * rh / 2)},${P(jy + up[1] * rh / 2)} `;
+      const v = r();
+      if (v < .22) {                                          // ქვის ფერის ვარიაცია — „ნახატის“ ფაქტურა
+        const [cx, cy] = [jx + (bx - ax) / 2, jy + (by - ay) / 2], hx = (bx - ax) / 2 - 1, hy = (by - ay) / 2;
+        tint += `<polygon points="${P(cx - hx - up[0] * rh / 2 + .5)},${P(cy - hy - up[1] * rh / 2)} ${P(cx + hx - up[0] * rh / 2)},${P(cy + hy - up[1] * rh / 2)} ${P(cx + hx + up[0] * rh / 2)},${P(cy + hy + up[1] * rh / 2)} ${P(cx - hx + up[0] * rh / 2 + .5)},${P(cy - hy + up[1] * rh / 2)}" fill="${v < .12 ? C.wallDark : '#fff6e0'}" opacity="${v < .12 ? .16 : .22}"/>`;
+      }
+    }
+  }
+  return tint + `<path d="${lines}" fill="none" stroke="${C.wallLine}" stroke-width="1.2"/><path d="${joints}" fill="none" stroke="${C.wallLine}" stroke-width="1.1"/>`;
+}
+// კლდეები კედლის / კოშკის ძირში (რეფერენსი: გალავანი კლდოვან მიწაზე დგას)
+function rocks(pts, step) {
+  const r = rng(Math.round(Math.abs(pts[0][0] * 3 + pts[0][1] * 5)) + 7);
+  return spaced(pts, step).filter(() => r() < .7).map(([x, y]) => {
+    const w = 8 + r() * 9, hh = 5 + r() * 6, dx = (r() - .5) * 10;
+    const pt = (a, b) => `${P(x + dx + a)},${P(y + 3 + b)}`;
+    return `<polygon points="${pt(-w, 2)} ${pt(-w * .7, -hh)} ${pt(w * .1, -hh - 3)} ${pt(w * .8, -hh * .6)} ${pt(w, 2)}" fill="#8d8576"/>` +
+      `<polygon points="${pt(-w * .7, -hh)} ${pt(w * .1, -hh - 3)} ${pt(w * .05, -hh * .2)} ${pt(-w * .6, -hh * .3)}" fill="#b4ab99"/>` +
+      `<polygon points="${pt(w * .1, -hh - 3)} ${pt(w * .8, -hh * .6)} ${pt(w, 2)} ${pt(w * .1, 2)}" fill="#6b6457" opacity=".8"/>`;
+  }).join('');
+}
+
 // მრგვალი კოშკი ღერძით up-ის მიმართულებით, კონუსური სახურავით; ძირში ფართო ქვის საძირკველი და მკვრივი ჩრდილი (მიწაზე დგას)
 function towerAt([x, y], up, h, r = 22) {
   const [ux, uy] = up, tx = x + ux * h, ty = y + uy * h, ax = tx + ux * 44, ay = ty + uy * 44;
@@ -408,21 +459,32 @@ function wallTower(pts, q, up, h, H, thick, dv = up, half = 34) {
     return `<polygon points="${pt(-w, 0)} ${pt(-w, dh * .7)} ${pt(-w * .6, dh * .92)} ${pt(0, dh)} ${pt(w * .6, dh * .92)} ${pt(w, dh * .7)} ${pt(w, 0)}" fill="#1a1410" stroke="${C.wallDark}" stroke-width=".8"/>`;
   };
   const cap = ([x, y]) => `<polygon points="${P(x + ux * h)},${P(y + uy * h)} ${P(x + ux * H)},${P(y + uy * H)} ${P(x + ux * H + vx * thick)},${P(y + uy * H + vy * thick)} ${P(x + ux * h + vx * thick)},${P(y + uy * h + vy * thick)}" fill="${C.wallLine}" stroke="${C.wallDark}" stroke-width=".8"/>` + door([x, y]);
-  let g = cap(seg[0]) + cap(seg.at(-1)) + wallBand(seg, up, H, thick, { depth: dv, noShadow: true, sides: true });
+  let g = rocks(subLine(pts, q, half + 14, 6), 16) +                // კლდეები ძირში, კოშკზე ოდნავ განიერად
+    cap(seg[0]) + cap(seg.at(-1)) + wallBand(seg, up, H, thick, { depth: dv, noShadow: true, sides: true, noRocks: true, blockW: 17 });
+  // კუთხის სიღრმე: მარცხენა კიდე — მზეზე (ნათელი), მარჯვენა — ჩრდილში; ასე კოშკი მოცულობით ჩანს და არა ბრტყელ ფურცლად
+  g += `<path d="M${[...seg.slice(0, 2), ...shift(seg.slice(0, 2), up, H).reverse()].map(p => p.join(',')).join(' L')} Z" fill="#fff6e0" opacity=".2"/>` +
+    `<path d="M${[...seg.slice(-2), ...shift(seg.slice(-2), up, H).reverse()].map(p => p.join(',')).join(' L')} Z" fill="#3a2e1e" opacity=".22"/>`;
+  // კონსოლები (გამოწეული ზოლი კბილანების ქვეშ — რეფერენსის კოშკზე): ღია ზოლი და მის ქვეშ მუქი „კბილები“
+  const ledge = shift(seg, up, H - 2);
+  g += `<path d="${line(ledge)}" fill="none" stroke="${C.wallDark}" stroke-width="7" stroke-opacity=".55"/><path d="${line(shift(seg, up, H - 1))}" fill="none" stroke="${C.wallTop}" stroke-width="4"/>` +
+    spaced(shift(seg, up, H - 6), 8).slice(0, -1).map(([x, y]) => `<rect x="${P(x + 1)}" y="${P(y)}" width="4" height="7" rx="1" fill="${C.wallDark}" opacity=".6"/>`).join('');
   // ვიწრო სარკმლები შუაში
   const [cx, cy] = seg[Math.floor(seg.length / 2)];
-  for (const f of [.45, .72]) g += `<rect x="${P(cx + ux * H * f - 2.5)}" y="${P(cy + uy * H * f - 6)}" width="5" height="12" rx="1.5" fill="${C.wallDark}" opacity=".85"/>`;
+  g += `<rect x="${P(cx + ux * H * .78 - 2.5)}" y="${P(cy + uy * H * .78 - 6)}" width="5" height="12" rx="1.5" fill="${C.wallDark}" opacity=".85"/>`;
+  g += hangBanner(cx + ux * H * .6, cy + uy * H * .6, 17, H * .38);        // კოშკზე — წითელი ბაირაღი (რეფერენსი)
   return g;
 }
 function rampart(L, towers) {
   const h = L.wallH || WALL_H, thick = L.wallThick || 44, gate = L.spots.find(q => q.id === 'wall');
   return wallBand(L.wall, L.wallUp, h, thick, { guards: true, depth: L.wallDepth, skip: [...towers, [gate.x, gate.y]] }) +
-    towers.map(p => wallTower(L.wall, p, L.wallUp, h, h + 40, thick, L.wallDepth || L.wallUp)).join('');
+    wallBanners(L.wall, L.wallUp, h, [...towers, [gate.x, gate.y]]) +
+    towers.map(p => wallTower(L.wall, p, L.wallUp, h, h + 58, thick, L.wallDepth || L.wallUp)).join('');
 }
 
 const peak = ([x, w, h, base], rock, shade, snow) =>
   `<polygon points="${P(x - w / 2)},${P(base)} ${P(x)},${P(base - h)} ${P(x + w / 2)},${P(base)}" fill="${rock}"/><polygon points="${P(x)},${P(base - h)} ${P(x + w / 2)},${P(base)} ${P(x + 8)},${P(base)}" fill="${shade}"/>` +
-  `<polygon points="${P(x - w * .13)},${P(base - h * .7)} ${P(x)},${P(base - h)} ${P(x + w * .13)},${P(base - h * .7)} ${P(x + w * .04)},${P(base - h * .64)} ${P(x - w * .05)},${P(base - h * .73)}" fill="${snow}"/>`;
+  `<polygon points="${P(x - w * .2)},${P(base - h * .56)} ${P(x)},${P(base - h)} ${P(x + w * .2)},${P(base - h * .56)} ${P(x + w * .09)},${P(base - h * .5)} ${P(x + w * .02)},${P(base - h * .6)} ${P(x - w * .07)},${P(base - h * .52)}" fill="${snow}"/>` +
+  `<polygon points="${P(x)},${P(base - h)} ${P(x + w * .2)},${P(base - h * .56)} ${P(x + w * .09)},${P(base - h * .5)} ${P(x + w * .03)},${P(base - h * .62)}" fill="#c9d6ea"/>`;
 
 // შორეული, ბურუსიანი ნაპირი ჰორიზონტზე
 function farShore(L) {
@@ -437,11 +499,25 @@ function mountains(L) {
   const r = rng(8), end = L.ext.x + L.ext.w;
   let g = '';
   if (!M.bare) {
-    for (let x = M.from; x < end; x += 150) g += peak([x, 260, 150 + r() * 70, L.horizon + 30], '#a39cbf', '#8f88ae', '#eeeaf4');
+    for (let x = M.from; x < end; x += 150) g += peak([x, 260, 150 + r() * 70, L.horizon + 30], '#9aa7c4', '#7b88a8', '#f6f9ff');
     g += `<rect x="${M.from - 60}" y="${L.horizon + 20}" width="${end - M.from + 60}" height="${M.base - L.horizon}" fill="${C.dark}"/>`;
   }
-  for (let x = M.from + 40; x < end; x += 130) g += peak([x, 230 + r() * 40, 100 + r() * 70, M.base + r() * 12], '#8b8274', '#6c6458', '#f4f1ea');
+  for (let x = M.from + 40; x < end; x += 130) g += peak([x, 230 + r() * 40, 110 + r() * 80, M.base + r() * 12], '#7c88a3', '#566180', '#ffffff');
   return g + `<path d="M${M.from - 40},${M.base + 12} Q${M.from + 200},${M.base - 14} ${M.from + 420},${M.base + 8} T${M.from + 900},${M.base + 4} T${end},${M.base + 6} L${end},${M.line + 10} L${M.from - 40},${M.line + 10} Z" fill="${C.dark}"/>`;
+}
+
+// „ნახატის“ ფაქტურა (რეფერენსი): ხმაურით შექმნილი რბილი ლაქები — ბალახზე მუქი და ნათელი მწვანე, ზღვაზე ნათელი ნაკადები
+function texture(id, L) {
+  const e = L.ext, r = `x="${e.x}" y="${e.y}" width="${e.w}" height="${e.h}"`;
+  const noise = (fid, freq, seed, matrix) => `<filter id="${id}-${fid}" filterUnits="userSpaceOnUse" ${r}><feTurbulence type="fractalNoise" baseFrequency="${freq}" numOctaves="3" seed="${seed}"/>` +
+    `<feColorMatrix type="matrix" values="${matrix}"/></filter>`;
+  return `<defs>` +
+    noise('tdark', '.009 .011', 4, '0 0 0 0 .07  0 0 0 0 .24  0 0 0 0 .06  2.2 0 0 0 -1.05') +
+    noise('tlight', '.013 .010', 9, '0 0 0 0 .78  0 0 0 0 .86  0 0 0 0 .36  0 2.2 0 0 -1.15') +
+    noise('tsea', '.0035 .028', 2, '0 0 0 0 .85  0 0 0 0 .95  0 0 0 0 1  0 0 2.4 0 -1.35') +
+    `</defs><g clip-path="url(#${id}-land)"><rect ${r} filter="url(#${id}-tdark)" opacity=".75"/><rect ${r} filter="url(#${id}-tlight)" opacity=".2"/></g>` +
+    `<g clip-path="url(#${id}-sea-only)"><rect ${r} filter="url(#${id}-tsea)" opacity=".28"/></g>` +
+    `<defs><clipPath id="${id}-sea-only"><path d="M${e.x},${e.y} H${e.x + e.w} V${e.y + e.h} H${e.x} Z ${L.land}" clip-rule="evenodd"/></clipPath></defs>`;
 }
 
 // მიწის ფენა — მხოლოდ ხილული ნაწილი (view: {x, y, w, h} რუკის ერთეულებში); ტყე და სახლები ხილვის გარეთ არ იხატება
@@ -462,8 +538,15 @@ export function drawGround(id, view, L) {
   if (I) s += `<ellipse cx="${I.cx}" cy="${I.cy + 4}" rx="${I.rx + 16}" ry="${I.ry + 10}" fill="${C.foam}" opacity=".3"/><ellipse cx="${I.cx}" cy="${I.cy}" rx="${I.rx + 8}" ry="${I.ry + 6}" fill="${C.sand}"/>` +
     `<ellipse cx="${I.cx}" cy="${I.cy - 2}" rx="${I.rx}" ry="${I.ry}" fill="${C.grass}"/><ellipse cx="${I.cx}" cy="${I.cy - 4}" rx="${I.rx * .7}" ry="${I.ry * .6}" fill="${C.meadow}" opacity=".7"/>`;
   // ნაპირი: ქაფი, ქვიშა, ბალახი
-  s += `<path d="${L.land}" fill="none" stroke="${C.foam}" stroke-opacity=".35" stroke-width="44" stroke-linejoin="round"/><path d="${L.land}" fill="${C.sand}" stroke="${C.sand}" stroke-width="26" stroke-linejoin="round"/>`;
+  // ნაპირი (რეფერენსი): ფირუზისფერი მეჩეჩი, ქაფი, კლდოვანი ზოლი, ვიწრო ქვიშა
+  s += [300, 230, 170, 120, 80].map((w, i) => `<path d="${L.land}" fill="none" stroke="${C.shallow}" stroke-opacity="${.12 + i * .07}" stroke-width="${w}" stroke-linejoin="round"/>`).join('') +
+    `<path d="${L.land}" fill="none" stroke="${C.foam}" stroke-opacity=".6" stroke-width="40" stroke-linejoin="round"/>` +
+    `<path d="${L.land}" fill="${C.rock}" stroke="#5f584d" stroke-width="36" stroke-linejoin="round"/>` +
+    `<path d="${L.land}" fill="none" stroke="${C.rock}" stroke-width="28" stroke-linejoin="round"/>` +
+    `<path d="${L.land}" fill="none" stroke="${C.rockLight}" stroke-width="20" stroke-dasharray="7 9 4 12" stroke-linejoin="round"/>` +
+    `<path d="${L.land}" fill="none" stroke="${C.sand}" stroke-width="12" stroke-linejoin="round"/>`;
   s += `<path d="${L.land}" fill="${C.grass}" transform="translate(0,4)"/><path d="${L.land}" fill="${C.grass}"/>`;
+  s += texture(id, L);
   s += mountains(L);
   s += patches.filter(([x, y]) => seen(x, y)).map(([x, y, rx, ry, light]) => `<ellipse cx="${P(x)}" cy="${P(y)}" rx="${P(rx)}" ry="${P(ry)}" fill="${light ? C.meadow : C.dark}" opacity=".3"/>`).join('');
   L.fields.forEach(([fx, fy], i) => { s += `<polygon points="${fx},${fy} ${fx + 44},${fy - 12} ${fx + 62},${fy + 6} ${fx + 18},${fy + 18}" fill="${FIELD_COLORS[i % 4]}" stroke="#a48a46" stroke-width="1.2"/>`; });
@@ -490,14 +573,15 @@ export function drawGround(id, view, L) {
   s += `<g clip-path="url(#${id}-land)"><path d="${riverD}" fill="none" stroke="${C.sand}" stroke-width="44" stroke-linecap="round" opacity=".7"/>` +
     `<path d="${mouthD}" fill="none" stroke="${C.riverEdge}" stroke-width="34"/></g>` +
     `<path d="${mouthD}" fill="none" stroke="url(#${id}-sea)" stroke-width="26"/>` +
-    `<g clip-path="url(#${id}-land)"><path d="${riverD}" fill="none" stroke="#9fe0f0" stroke-width="3" stroke-dasharray="14 26" stroke-linecap="round" opacity=".5"/></g>`;
+    `<g clip-path="url(#${id}-land)"><path d="${riverD}" fill="none" stroke="#bfefff" stroke-width="3.5" stroke-dasharray="14 22" stroke-linecap="round" opacity=".65"/></g>`;
   s += bridges.map(bridge).join('');
   // სახლები, რაზმები, ხეები — სიღრმის მიხედვით (ზემოთ მდგარი — უკან); გალავანი — ხმელეთზე, ხეების წინ / უკან
   const items = [
     ...houses.filter(([x, y]) => seen(x, y)).map(([x, y, b]) => [x, y, house(x, y, b)]),
     ...inner.map(([x, y, kind]) => [x, y, kind === 'tower' ? towerAt([x, y], UPRIGHT, 46, 11) : house(x, y, kind)]),
     ...units.map(([x, y, col]) => [x, y, unit(x, y, col)]),
-    ...trees.filter(([x, y]) => seen(x, y)).map(([x, y, sc, isOak]) => [x, y, isOak ? oak(x, y, sc, ...C.oak) : tree(x, y, sc, ...C.tree)])
+    ...trees.filter(([x, y]) => seen(x, y)).map(([x, y, sc, isOak]) => [x, y, `<ellipse cx="${P(x + 6 * sc)}" cy="${P(y + 1)}" rx="${P(26 * sc)}" ry="${P(8 * sc)}" fill="#0c2a12" opacity=".32"/>` +
+      (isOak ? oak(x, y, sc, ...C.oak) : tree(x, y, sc, ...C.tree))])
   ].sort((a, b) => a[1] - b[1]);
   const wallYAt = x => L.wall.reduce((b, q) => Math.abs(q[0] - x) < Math.abs(b[0] - x) ? q : b)[1];
   const behind = i => i[1] < wallYAt(i[0]);
@@ -714,7 +798,8 @@ function citadelWall(L) {
   const g = citadelGate(L), saved = { wallTop: C.wallTop, wallFace: C.wallFace, wallDark: C.wallDark, wallLine: C.wallLine };
   Object.assign(C, CASTLE_STONE);                       // გალავანი — სასახლის ქვით, რომ ერთი ციხესიმაგრე იყოს
   try {
-    return wallBand(L.citadel, L.citadelUp || UPRIGHT, 96, 50, { depth: L.citadelDepth, guardsAt: L.citadelGuards ? betweenTowers(L.citadel, citadelTowers(L), L.focus) : null }) + citadelTowers(L).map(q => wallTower(L.citadel, q, L.citadelUp || UPRIGHT, 96, 136, 50, L.citadelDepth || L.citadelUp || UPRIGHT)).join('') +
+    return wallBand(L.citadel, L.citadelUp || UPRIGHT, 96, 50, { depth: L.citadelDepth, guardsAt: L.citadelGuards ? betweenTowers(L.citadel, citadelTowers(L), L.focus) : null }) +
+      wallBanners(L.citadel, L.citadelUp || UPRIGHT, 96, [...citadelTowers(L), g], 170) + citadelTowers(L).map(q => wallTower(L.citadel, q, L.citadelUp || UPRIGHT, 96, 152, 50, L.citadelDepth || L.citadelUp || UPRIGHT)).join('') +
       `<g transform="translate(${g[0]},${g[1]})">${gateAt(L.citadelGateDir || [1, 0])}</g>`;
   } finally { Object.assign(C, saved); }
 }
