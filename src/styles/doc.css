@@ -1,0 +1,25 @@
+/* ტექსტური გვერდები (pages/: კონფიდენციალურობა, წესები, მშობლებისთვის) — ჩვეულებრივი, სქროლვადი გვერდი იმავე ფერებით */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  min-height: 100vh; color: var(--ink); font: 16px/1.7 var(--font-sans); -webkit-font-smoothing: antialiased;
+  background: radial-gradient(ellipse at 50% -10%, #3d2c94 0%, #191c66 35%, var(--night) 75%) fixed;
+}
+.doc { max-width: 760px; margin: 0 auto; padding: 28px 20px 60px; }
+.doc__back {
+  display: inline-flex; align-items: center; gap: 8px; margin-bottom: 26px; padding: 7px 14px; border-radius: 999px;
+  color: var(--ink); text-decoration: none; font-weight: 700; font-size: 14px;
+  border: 1px solid rgba(255, 255, 255, .25); background: rgba(255, 255, 255, .06); transition: border-color .15s, color .15s;
+}
+.doc__back:hover { border-color: var(--gold); color: var(--gold-text); }
+.doc h1 { font: 900 clamp(28px, 6vw, 40px)/1.2 var(--font-serif); color: var(--gold-text); }
+.doc__meta { margin: 6px 0 22px; color: var(--muted); font-size: 14px; }
+.doc__draft {
+  margin-bottom: 26px; padding: 12px 16px; border-radius: 12px; font-size: 14px;
+  background: rgba(242, 181, 74, .12); border: 1px solid rgba(242, 181, 74, .4);
+}
+.doc h2 { margin: 30px 0 8px; font-size: 20px; color: #ffe7b8; }
+.doc p, .doc li { color: #ece4d6; }
+.doc ul { margin: 8px 0 0 22px; }
+.doc li + li { margin-top: 4px; }
+.doc a { color: var(--gold-text); }
+.doc__card { margin-top: 12px; padding: 14px 16px; border-radius: 14px; background: rgba(255, 255, 255, .05); border: 1px solid var(--line); }

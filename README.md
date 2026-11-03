@@ -16,18 +16,22 @@ npm run dev          # → http://localhost:5173
 
 ```
 index.html                  გვერდის ჩონჩხი: სად დგას რომელი კომპონენტი
-public/                     სტატიკური ფაილები (logo.svg, favicon.svg — ლოგო; მომავალში — სურათები, ხმები)
+public/                     სტატიკური ფაილები: logo.svg, favicon.svg, icon-192/512.png (ხატულები), og-image.jpg (გაზიარების სურათი), manifest.webmanifest (PWA — ჯერ გამორთულია)
+pages/                      privacy.html, terms.html, parents.html — კონფიდენციალურობა, წესები, მშობლებისთვის (⚠️ პროექტი)
 src/
   main.js                   კომპონენტების ჩამტვირთავი
-  core/                     state.js (საერთო მდგომარეობა), i18n.js (თარგმანები), geo.js (სტუმრის ქვეყანა IP-ით → ენა), prefs.js (სტუმრის პარამეტრები)
+  core/                     state.js (საერთო მდგომარეობა), screens.js (მთავარი გვერდი ↔ თამაში, გადასვლა), i18n.js (თარგმანები), geo.js (სტუმრის ქვეყანა IP-ით → ენა), prefs.js (სტუმრის პარამეტრები)
   i18n/                     languages.js (ენები, თარგმანები, ქვეყანა → ენა), ka/en/tr/hy/az/ru/kk/uz.js — რვავე ენის ტექსტები
-  styles/                   tokens.css (ფერები, შრიფტები), base.css, buttons.css
+  styles/                   tokens.css (ფერები, შრიფტები), base.css, buttons.css, doc.css (ტექსტური გვერდები)
   components/
     scene/                  ფონის ნახატი ორ ფენად: უძრავი — canvas-ზე, მოძრავი — SVG (draw/ — რელიეფი, ციხეები, ჯარი, ხმალი, fx.js — ფენების გამყოფი)
     site-header/            ზედა ზოლი: ლოგო, შესვლა
     lang-switcher/          ენის არჩევა
     hero/                   მთავარი ტექსტი და „რას ვასწავლით“
     start-button/           „დაიწყე“ ღილაკი სცენაზე
+    game/                   თამაში (ჯერ არასრული): სამეფოს რუკა შენობებით, ზედა ზოლი, ქვედა მენიუ — „დაიწყე“ ხსნის
+    quick-quiz/             „სწრაფი გამოწვევა“ — 3 კითხვა დროშებზე (თამაშში, რუკების დარბაზიდან), ოქრო
+    site-footer/            ქვედა ბმულები (კონფიდენციალურობა, წესები, მშობლებისთვის)
 content/                    ტესტები (JSON) და მათი ფორმატი
 database/                   PostgreSQL სქემა და საწყისი მონაცემები
 docs/                       GAME_DESIGN.md (იდეები, გადაწყვეტილებები), ARCHITECTURE.md (კოდის აგებულება)

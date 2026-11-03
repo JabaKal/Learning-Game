@@ -22,4 +22,9 @@ export function applyTranslations(root) {
 }
 
 // ენის შეცვლისას მთელი გვერდი თავიდან ითარგმნება
-on('lang', () => { applyTranslations(document.body); document.title = t('meta.title'); });
+on('lang', () => {
+  applyTranslations(document.body);
+  document.title = t('meta.title');
+  for (const sel of ['meta[name="description"]', 'meta[property="og:description"]']) document.querySelector(sel)?.setAttribute('content', t('meta.description'));
+  document.querySelector('meta[property="og:title"]')?.setAttribute('content', t('meta.title'));
+});

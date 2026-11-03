@@ -1,7 +1,8 @@
 // Türkçe metinler (ka.js ile aynı anahtarlar)
 export default {
   meta: {
-    title: 'Öğren. İnşa Et. Hükmet.'
+    title: 'Öğren. İnşa Et. Hükmet.',
+    description: 'Eğitici strateji oyunu: oynayarak dil ve coğrafya öğren, ücretsiz.'
   },
   header: {
     home: 'Ana sayfa',
@@ -42,5 +43,51 @@ export default {
   },
   start: {
     label: 'Başla'
+  },
+  footer: {
+    privacy: 'Gizlilik',
+    terms: 'Kurallar',
+    parents: 'Ebeveynler için'
+  },
+  game: {
+    title: 'Krallığın',
+    guest: 'Misafir',
+    soon: 'Yakında',
+    soonText: 'henüz yapım aşamasında, yakında açılıyor!',
+    castleText: 'Sarayın — yakında krallığını burada büyüteceksin',
+    profileSoon: 'Kayıt yakında açılıyor',
+    night: 'Gece',
+    day: 'Gündüz',
+    spots: {
+      castle: 'Saray',
+      profile: 'Profil',
+      shop: 'Dükkân',
+      academy: 'Diller',
+      geography: 'Coğrafya',
+      army: 'Ordu',
+      wall: 'Sur',
+      battlefield: 'Savaş Alanı',
+      friends: 'Arkadaşlar',
+      wrecks: 'Batık gemiler'
+    },
+    nav: { kingdom: 'Krallık', learn: 'Öğren', battle: 'Savaş', profile: 'Profil' }
+  },
+  // „სწრაფი გამოწვევა“ — დროშების მინი-თამაში („დაიწყე“ ხსნის); {n}, {total} — რიცხვები
+  quiz: {
+    title: 'Hızlı meydan okuma',
+    intro: 'Üç soru — krallığın için altın kazan!',
+    find: 'Bayrağı bul:',
+    correct: 'Doğru! +10 altın',
+    wrong: 'Yanlış. Doğru cevap:',
+    next: 'Sonraki',
+    question: 'Soru {n} / {total}',
+    result: 'Kazandığın',
+    gold: 'altın',
+    score: '{total} sorudan {n} doğru',
+    again: 'Tekrar oyna',
+    save: 'Krallığını kaydet',
+    soon: 'Kayıt yakında açılıyor — bu bir deneme turu.',
+    close: 'Kapat',
+    countries: { FR: 'Fransa', DE: 'Almanya', IT: 'İtalya', JP: 'Japonya', GE: 'Gürcistan', UA: 'Ukrayna', AM: 'Ermenistan', PL: 'Polonya', NL: 'Hollanda', SE: 'İsveç' }
   }
 };

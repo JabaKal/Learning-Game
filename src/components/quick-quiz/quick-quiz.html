@@ -1,0 +1,18 @@
+<div class="quiz" role="dialog" aria-modal="true" aria-labelledby="quiz-title" hidden>
+  <div class="quiz__backdrop" data-close></div>
+  <div class="quiz__card">
+    <button type="button" class="quiz__close" data-close data-i18n-attr="aria-label:quiz.close">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 L18 18 M18 6 L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+    </button>
+    <div class="quiz__head">
+      <h2 class="quiz__title" id="quiz-title" data-i18n="quiz.title"></h2>
+      <div class="quiz__gold" aria-live="polite"><span class="quiz__coin" aria-hidden="true"></span><b class="quiz__gold-n">0</b></div>
+    </div>
+    <div class="quiz__progress"><i></i></div>
+    <!-- ეკრანს ავსებს quick-quiz.js: კითხვა (დროშები) ან შედეგი -->
+    <div class="quiz__body"></div>
+  </div>
+</div>
+
+<!-- Live Server ჩასვამს თავის სკრიპტს ამ ტეგის წინ (main.js მას შლის); თავად ტეგი იგნორირდება -->
+</body>

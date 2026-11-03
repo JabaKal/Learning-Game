@@ -36,35 +36,20 @@ export function init(root) {
     canvas.style.cssText = `left:0;top:0;width:${innerWidth}px;height:${innerHeight}px`;
     ctx.setTransform(frame.k * dpr, 0, 0, frame.k * dpr, (frame.ox - frame.vx * frame.k) * dpr, (frame.oy - frame.vy * frame.k) * dpr);
     ctx.drawImage(image, BOUNDS.x, BOUNDS.y, BOUNDS.w, BOUNDS.h);
+    set('sceneReady', true);                          // main.js ამის შემდეგ აჩენს გვერდს
   };
   image.onload = paint;
 
   // ნახატის ჩარჩო (vx, vy, vw, vh) ეკრანზე „slice“ წესით: ფარავს მთელ ეკრანს, შუაშია ჰორიზონტალურად, ქვედა კიდე ეკრანის ძირზეა.
   // ორივე ფენა ერთნაირად დგას; იხატება მხოლოდ მაშინ, როცა ჩარჩო მართლა შეიცვალა (ხელახალი ხატვა ძვირია).
   // აბრუნებს ფუნქციას: ნახატის წერტილი → ეკრანის პიქსელები
-  // animateNext — ენის შეცვლისას (ტელეფონზე ტექსტის სიმაღლე იცვლება და სცენა ინაცვლებს): ორივე ფენა ძველი ადგილიდან ახალზე
-  // რბილად გადადის (.3 წმ, იგივე, რაც ტექსტი hero-ში) — ახალი ჩარჩო ეკრანზე ძველის სახით იწყება და ადგილზე „ჯდება“
-  let placed = '', animateNext = false;
-  // ეკრანზე ძველი ჩარჩო ახლის მიმართ: p_ძველი = a·p_ახალი + b. ელემენტის ლოკალურ კოორდინატებში (origin — მისი ზედა-მარცხენა
-  // კუთხე L) ეს არის translate(b + (a−1)·L) scale(a); canvas-ისთვის L = 0
-  const glide = (from, to) => {
-    if (!from || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const a = from.k / to.k, bx = (from.ox - from.vx * from.k) - a * (to.ox - to.vx * to.k), by = (from.oy - from.vy * from.k) - a * (to.oy - to.vy * to.k);
-    if (Math.abs(a - 1) < .002 && Math.abs(bx) < .5 && Math.abs(by) < .5) return;
-    const fxL = [to.ox - (to.vx - BOUNDS.x) * to.k, to.oy - (to.vy - BOUNDS.y) * to.k];
-    for (const [el, L] of [[canvas, [0, 0]], [fx, fxL]])
-      el.animate([{ transformOrigin: '0 0', transform: `translate(${bx + (a - 1) * L[0]}px, ${by + (a - 1) * L[1]}px) scale(${a})` },
-        { transformOrigin: '0 0', transform: 'none' }], { duration: 300, easing: 'cubic-bezier(.4, 0, .2, 1)' });
-  };
+  let placed = '';
   const place = (vx, vy, vw, vh) => {
     const k = Math.max(innerWidth / vw, innerHeight / vh);
     const ox = (innerWidth - vw * k) / 2, oy = innerHeight - vh * k;
     const key = `${vx},${vy},${vw},${vh},${innerWidth},${innerHeight}`;
     if (key !== placed) {
-      const prev = frame;
       placed = key; frame = { k, ox, oy, vx, vy, sw: innerWidth, sh: innerHeight };
-      if (animateNext && prev && prev.sw === innerWidth && prev.sh === innerHeight) glide(prev, frame);
-      animateNext = false;
       fx.style.cssText = `left:${(ox - (vx - BOUNDS.x) * k).toFixed(1)}px;top:${(oy - (vy - BOUNDS.y) * k).toFixed(1)}px;width:${(BOUNDS.w * k).toFixed(1)}px;height:${(BOUNDS.h * k).toFixed(1)}px`;
       paint();
     }
@@ -74,9 +59,12 @@ export function init(root) {
   const fit = () => {
     if (!MOBILE.matches) {
       const [x, y] = place(0, 0, W, H)(...DESKTOP_START);
-      return set('startButton', { x, y: Math.min(innerHeight - 46, y) });
+      return set('startButton', { x, y: Math.min(innerHeight - 70, y) });
     }
-    const textBottom = (get('heroBottom') || 0) + 6;
+    // ტექსტის სიმაღლე იზომება ჩატვირთვისას და ეკრანის ზომის შეცვლისას; ენის შეცვლისას ფონი ადგილზე რჩება
+    // (სხვა ენაზე ტექსტი შეიძლება უფრო გრძელი იყოს — ფონი მაინც არ ინაცვლებს)
+    const textBottom = pinnedTextBottom ?? (get('heroBottom') || 0) + 6;
+    usedTextBottom = textBottom;
     const need = FORK_Y + 300 - SWORD_TOP;                                   // ხმლის წვერიდან ღილაკამდე
     // დაბალ ეკრანზე სცენა პატარავდება, მაგრამ არა იმდენად, რომ ნახატის გვერდითი კიდეები გამოჩნდეს (სიგანე ≤ 1300)
     const k = Math.max(innerWidth / 1300, Math.min(innerWidth / FOCUS_WIDTH, (innerHeight - textBottom) / need));
@@ -85,12 +73,13 @@ export function init(root) {
     // ღილაკი ბილიკზე: ჯარების შეერთებასა და ეკრანის ქვედა კიდეს შორის
     const forkPx = (FORK_Y + 70 - top) * k, onPath = forkPx + (innerHeight - forkPx) * .55;
     // ღილაკი ტექსტის პანელს არ უნდა ფარავდეს (დაბალ ეკრანზე პანელი ქვემოთ ჩადის) და ეკრანიდან არ უნდა გავიდეს
-    set('startButton', { x: innerWidth / 2, y: Math.min(innerHeight - 36, Math.max(textBottom + 34, onPath)) });
+    set('startButton', { x: innerWidth / 2, y: Math.min(innerHeight - 62, Math.max(textBottom + 34, onPath)) });
   };
   let timer = 0;
-  const schedule = () => { clearTimeout(timer); timer = setTimeout(fit, animateNext ? 0 : 120); };   // ზომის ცვლილებისას — დაყოვნებით, რომ ყოველ პიქსელზე არ დაიხატოს
-  on('langChanging', () => { animateNext = true; setTimeout(() => { animateNext = false; }, 400); });
-  addEventListener('resize', schedule);
+  const schedule = () => { clearTimeout(timer); timer = setTimeout(fit, 120); };   // ზომის ცვლილებისას — დაყოვნებით, რომ ყოველ პიქსელზე არ დაიხატოს
+  let pinnedTextBottom = null, usedTextBottom = null;
+  on('langChanging', () => { pinnedTextBottom ??= usedTextBottom; });      // ენა იცვლება — ფონი ადგილზე რჩება
+  addEventListener('resize', () => { pinnedTextBottom = null; schedule(); });   // ახალი ეკრანის ზომა — ტექსტს თავიდან ვზომავთ
   if (document.readyState !== 'complete') addEventListener('load', schedule);   // ჩატვირთვის ბოლოს ეკრანის ზომა საბოლოოა
   on('heroBottom', schedule);                                            // ტექსტის სიმაღლე შეიცვალა (ენა, შრიფტი, ზომა)
   if (!MOBILE.matches || get('heroBottom') !== undefined) fit();         // ტელეფონზე ტექსტის სიმაღლეს ველოდებით, რომ სურათი ორჯერ არ დაიხატოს

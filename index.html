@@ -3,10 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="სასწავლო სტრატეგიული თამაში: ისწავლე ენები და გეოგრაფია თამაშით, უფასოდ.">
+<meta name="description" content="áƒ¡áƒáƒ¡áƒ¬áƒáƒ•áƒšáƒ áƒ¡áƒ¢áƒ áƒáƒ¢áƒ”áƒ’áƒ˜áƒ£áƒšáƒ˜ áƒ—áƒáƒ›áƒáƒ¨áƒ˜: áƒ˜áƒ¡áƒ¬áƒáƒ•áƒšáƒ” áƒ”áƒœáƒ”áƒ‘áƒ˜ áƒ“áƒ áƒ’áƒ”áƒáƒ’áƒ áƒáƒ¤áƒ˜áƒ áƒ—áƒáƒ›áƒáƒ¨áƒ˜áƒ—, áƒ£áƒ¤áƒáƒ¡áƒáƒ“.">
 <meta name="theme-color" content="#191c66">
-<title>ისწავლე. ააშენე. იმეფე.</title>
+<title>áƒ˜áƒ¡áƒ¬áƒáƒ•áƒšáƒ”. áƒáƒáƒ¨áƒ”áƒœáƒ”. áƒ˜áƒ›áƒ”áƒ¤áƒ”.</title>
 <link rel="icon" href="public/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="public/icon-192.png">
+<!-- áƒ’áƒáƒ–áƒ˜áƒáƒ áƒ”áƒ‘áƒ˜áƒ¡ áƒ‘áƒáƒ áƒáƒ—áƒ˜ (Facebook, Messenger, Telegram, X). âš ï¸ áƒ¡áƒáƒ˜áƒ¢áƒ˜áƒ¡ áƒ’áƒáƒ¨áƒ•áƒ”áƒ‘áƒ˜áƒ¡áƒáƒ¡ og:image áƒ“áƒ og:url â€” áƒ¡áƒ áƒ£áƒšáƒ˜ áƒ›áƒ˜áƒ¡áƒáƒ›áƒáƒ áƒ—áƒ˜áƒ— (https://áƒ“áƒáƒ›áƒ”áƒœáƒ˜/...) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="áƒ˜áƒ¡áƒ¬áƒáƒ•áƒšáƒ”. áƒáƒáƒ¨áƒ”áƒœáƒ”. áƒ˜áƒ›áƒ”áƒ¤áƒ”.">
+<meta property="og:description" content="áƒ¡áƒáƒ¡áƒ¬áƒáƒ•áƒšáƒ áƒ¡áƒ¢áƒ áƒáƒ¢áƒ”áƒ’áƒ˜áƒ£áƒšáƒ˜ áƒ—áƒáƒ›áƒáƒ¨áƒ˜: áƒ˜áƒ¡áƒ¬áƒáƒ•áƒšáƒ” áƒ”áƒœáƒ”áƒ‘áƒ˜ áƒ“áƒ áƒ’áƒ”áƒáƒ’áƒ áƒáƒ¤áƒ˜áƒ áƒ—áƒáƒ›áƒáƒ¨áƒ˜áƒ—, áƒ£áƒ¤áƒáƒ¡áƒáƒ“.">
+<meta property="og:image" content="public/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;600;700;800&family=Noto+Serif+Georgian:wght@800;900&family=Noto+Sans:wght@400;600;700;800&family=Noto+Serif:wght@800;900&family=Noto+Sans+Armenian:wght@400;600;700;800&family=Noto+Serif+Armenian:wght@800;900&display=swap" rel="stylesheet">
@@ -15,13 +24,22 @@
 <link rel="stylesheet" href="src/styles/buttons.css">
 </head>
 <body>
-  <!-- კომპონენტები: თითოეული იტვირთება src/components/<სახელი>/ საქაღალდიდან (იხ. src/main.js) -->
-  <div data-component="scene"></div>
-  <div data-component="site-header"></div>
-  <main>
-    <div data-component="hero"></div>
-  </main>
-  <div data-component="start-button"></div>
+  <!-- áƒ©áƒáƒ¢áƒ•áƒ˜áƒ áƒ—áƒ•áƒ˜áƒ¡ áƒ”áƒ™áƒ áƒáƒœáƒ˜: áƒ©áƒáƒœáƒ¡, áƒ¡áƒáƒœáƒáƒ› áƒ¤áƒáƒœáƒ˜áƒ¡ áƒœáƒáƒ®áƒáƒ¢áƒ˜, áƒ¨áƒ áƒ˜áƒ¤áƒ¢áƒ”áƒ‘áƒ˜ áƒ“áƒ áƒ™áƒáƒ›áƒžáƒáƒœáƒ”áƒœáƒ¢áƒ”áƒ‘áƒ˜ áƒ›áƒ–áƒáƒ“áƒáƒ (áƒ˜áƒ®. src/main.js) -->
+  <div class="boot" aria-hidden="true"><img class="boot__logo" src="public/logo.svg" alt="" width="192" height="60"><i class="boot__bar"></i></div>
+  <!-- áƒ™áƒáƒ›áƒžáƒáƒœáƒ”áƒœáƒ¢áƒ”áƒ‘áƒ˜: áƒ—áƒ˜áƒ—áƒáƒ”áƒ£áƒšáƒ˜ áƒ˜áƒ¢áƒ•áƒ˜áƒ áƒ—áƒ”áƒ‘áƒ src/components/<áƒ¡áƒáƒ®áƒ”áƒšáƒ˜>/ áƒ¡áƒáƒ¥áƒáƒ¦áƒáƒšáƒ“áƒ˜áƒ“áƒáƒœ (áƒ˜áƒ®. src/main.js) -->
+  <!-- თამაში (core/screens.js): დევს მთავარი გვერდის ქვეშ — „დაიწყე“ მთავარ გვერდს წიგნის ფურცელივით გადაფურცლავს -->
+  <div data-component="game"></div>
+  <!-- მთავარი გვერდი — ერთი „ფურცელი“ -->
+  <div class="landing">
+    <div data-component="scene"></div>
+    <div data-component="site-header"></div>
+    <main>
+      <div data-component="hero"></div>
+    </main>
+    <div data-component="start-button"></div>
+    <div data-component="site-footer"></div>
+  </div>
+  <div data-component="quick-quiz"></div>
 
   <script type="module" src="src/main.js"></script>
 </body>

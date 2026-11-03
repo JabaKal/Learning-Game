@@ -2,8 +2,9 @@
    ყოველი <div data-component="name"> იცვლება კომპონენტით src/components/name/ საქაღალდიდან:
    name.html (მარკაპი) + name.module.css (სტილი) + name.js (ქცევა, ექსპორტი: init(root)).
    კომპონენტს შეუძლია შიგნით სხვა კომპონენტებიც ჩასვას — ისინიც იტვირთება. */
-import { initState } from './core/state.js';
+import { initState, on } from './core/state.js';
 import { applyTranslations } from './core/i18n.js';
+import { initScreens } from './core/screens.js';
 
 const base = new URL('./components/', import.meta.url);
 
@@ -44,7 +45,17 @@ async function start() {
   const mounted = await mountAll(document.body);
   applyTranslations(document.body);
   for (const [el, module] of mounted) module.init?.(el);   // ჯერ ჩადგმული, მერე მშობელი კომპონენტი
-  document.documentElement.classList.add('is-ready');
+  initScreens();                                       // მთავარი გვერდი ან თამაში (მისამართით #play)
+  // გვერდი ჩნდება ერთად, როცა ფონის ნახატი დაიხატა და შრიფტები ჩაიტვირთა — რომ ფონი, ტექსტი და ღილაკი ცალ-ცალკე არ „ხტოდეს“.
+  // ნელ ინტერნეტზე — არაუმეტეს 4 წამისა
+  const sceneReady = new Promise(resolve => on('sceneReady', ready => ready && resolve()));
+  await Promise.race([Promise.all([sceneReady, document.fonts?.ready]), new Promise(r => setTimeout(r, 4000))]);
+  requestAnimationFrame(() => document.documentElement.classList.add('is-ready'));
 }
 
 start();
+
+// აპად დაყენება (PWA) და ოფლაინ რეჟიმი გამორთულია — ჯერ მხოლოდ ბრაუზერი (ავტორის გადაწყვეტილება, 2026-11-03).
+// ადრე დაყენებული service worker და მისი ქეში იშლება, რომ ბრაუზერი ტყუილად რესურსს არ ხარჯავდეს
+navigator.serviceWorker?.getRegistrations().then(list => list.forEach(r => r.unregister())).catch(() => {});
+globalThis.caches?.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(() => {});

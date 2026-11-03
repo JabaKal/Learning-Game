@@ -1,0 +1,124 @@
+/* თამაშის ეკრანი: რუკა მთელ ეკრანზე, ზემოთ — ზოლი (უკან, სათაური, ოქრო), ქვემოთ — მენიუ.
+   მთავარ გვერდზე თამაში მის ქვეშ დევს (z-index 1); „დაიწყე“-ზე ზემოთ ამოდის და მარჯვნიდან შემოსრიალდება, მარცხენა კიდეზე ჩრდილით
+   (core/screens.js; მთავარი გვერდის გადაწევა — base.css). მხოლოდ 2D სრიალი — მსუბუქია ტელეფონისთვისაც.
+   ანიმაციები მუშაობს მხოლოდ თამაშის ეკრანზე: html[data-screen="game"] (კონკრეტულ კლასებზე — არა „*“-ზე) */
+.game { position: fixed; inset: 0; z-index: 1; overflow: hidden; background: #1d4f86; color: var(--ink); will-change: transform; }  /* შრე წინასწარ (იხ. base.css .landing) */
+html[data-screen="game"] .game, html[data-switch] .game { z-index: 3; }
+html[data-switch] .game { box-shadow: -18px 0 50px rgba(5, 3, 12, .55); }
+html[data-switch="prep-in"] .game { transform: translateX(100%); }
+html[data-switch="in"] .game { animation: game-in .55s cubic-bezier(.22, .9, .3, 1) both; }
+html[data-switch="out"] .game { animation: game-out .45s cubic-bezier(.55, .05, .75, .45) both; }
+@keyframes game-in { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes game-out { from { transform: none; } to { transform: translateX(100%); } }
+
+/* რუკა ერთ ეკრანზე (სქროლისა და მასშტაბის გარეშე): მიწა — canvas, შენობები — SVG, ორივე მთელ ეკრანზე */
+.game__view { position: absolute; inset: 0; overflow: hidden; background: #3f8f3e; }
+.game__ground, .game__map, .game__lights { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* ღამე (.game--night): მიწა და შენობები ბნელდება და ცისფრდება, ინთება შუქები, ჩნდება ვარსკვლავები */
+.game__ground, .game__map { transition: filter 1.3s cubic-bezier(.45, 0, .25, 1); }
+.game--night .game__ground { filter: brightness(.38) saturate(.75) hue-rotate(12deg); }
+.game--night .game__map { filter: brightness(.6) saturate(.8); }
+.game__lights { pointer-events: none; opacity: 0; mix-blend-mode: screen; transition: opacity .5s ease; }
+.game--night .game__lights { transition: opacity 1s ease .9s; }          /* ჩირაღდნები ინთება, როცა უკვე დაბნელდა */
+.game--night .game__lights { opacity: .85; }
+.game__sky {
+  position: absolute; inset: 0 0 auto 0; height: 34%; pointer-events: none; opacity: 0; transition: opacity 1.3s ease;
+  background-image: radial-gradient(1.5px 1.5px at 12% 18%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 28% 8%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 44% 22%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 63% 12%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 81% 26%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 92% 9%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 6% 34%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 36% 40%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 72% 38%, #fff 50%, transparent 51%), linear-gradient(180deg, rgba(10, 14, 48, .55), transparent);
+}
+.game--night .game__sky { opacity: 1; }
+.game__skyback { position: absolute; inset: 0; z-index: 0; background: linear-gradient(180deg, #8fc6e8 0%, #dcedf2 22%); }
+.game__skyback::after { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 1.3s ease; background: linear-gradient(180deg, #060920 0%, #161c46 22%); }
+.game--night .game__skyback::after { opacity: 1; }
+
+/* შენობები */
+.spot { cursor: pointer; outline: none; }
+.spot__art { transition: transform .18s, filter .2s; transform-box: fill-box; transform-origin: 50% 100%; }
+.spot:hover .spot__art, .spot:focus-visible .spot__art { transform: translateY(-4px) scale(1.04); filter: brightness(1.08); }
+.spot.is-locked .spot__art { filter: saturate(.35) brightness(.88); }
+.spot.is-locked:hover .spot__art { filter: saturate(.5) brightness(.95); }
+.spot__glow { transform-box: fill-box; transform-origin: center; }
+html[data-screen="game"]:not([data-switch]) .spot__glow { animation: game-pulse 1.6s ease-in-out infinite alternate; }
+.spot__pill { fill: rgba(20, 12, 40, .78); stroke: rgba(242, 181, 74, .7); stroke-width: 1.5; }
+.spot:focus-visible .spot__pill { stroke: var(--gold-light); stroke-width: 3; }
+.spot__name { font: 800 15px var(--font-sans); fill: #ffe7b8; text-anchor: middle; }
+.spot__soon { font: 700 12px var(--font-sans); fill: #fff; text-anchor: middle; paint-order: stroke; stroke: rgba(20, 12, 40, .7); stroke-width: 3px; }
+.spot.is-locked .spot__pill { stroke: rgba(255, 255, 255, .3); }
+.spot.is-locked .spot__name { fill: #e8e0d0; }
+.game__fx .flag { transform-box: fill-box; transform-origin: 0% 50%; }
+.game__ship-bob { transform-box: fill-box; transform-origin: 50% 100%; }
+html[data-screen="game"]:not([data-switch]) .game__ship-bob { animation: game-ship 3.4s ease-in-out infinite alternate; }
+@keyframes game-ship { from { transform: rotate(-3deg) translateY(0); } to { transform: rotate(3deg) translateY(-3px); } }
+html[data-screen="game"]:not([data-switch]) .game__fx .flag { animation: game-wave 2.6s ease-in-out infinite alternate; }
+@keyframes game-pulse { from { opacity: .35; transform: scale(.9); } to { opacity: 1; transform: scale(1.08); } }
+@keyframes game-wave { from { transform: skewY(-4deg) scaleX(.93); } to { transform: skewY(3deg) scaleX(1); } }
+
+/* ზედა ზოლი */
+.game__bar {
+  position: absolute; z-index: 2; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  padding: max(10px, env(safe-area-inset-top, 0px)) var(--header-pad) 10px;
+  background: linear-gradient(180deg, rgba(14, 9, 30, .82), rgba(14, 9, 30, 0));
+}
+.game__mode {
+  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; touch-action: manipulation;
+  color: #ffe7b8; background: rgba(14, 9, 30, .6); border: 1px solid rgba(242, 181, 74, .45); transition: border-color .15s, color .15s, background .15s;
+}
+.game__mode svg { width: 22px; height: 22px; }
+.game__mode:hover { border-color: var(--gold); color: var(--gold-light); }
+.game__mode-sun, .game--night .game__mode-moon { display: none; }
+.game__mode.is-spin svg { animation: game-spin .7s cubic-bezier(.3, 1.4, .5, 1); }
+@keyframes game-spin { from { transform: rotate(-200deg) scale(.3); opacity: 0; } to { transform: none; opacity: 1; } }
+/* მზის ჩასვლის / ამოსვლის შუქი: თბილი ფერი ზემოდან ქვემოთ გადაივლის და ქრება */
+.game__dusk { position: absolute; inset: 0; pointer-events: none; opacity: 0; mix-blend-mode: soft-light;
+  background: linear-gradient(180deg, rgba(255, 140, 60, .9) 0%, rgba(255, 90, 80, .6) 40%, rgba(120, 60, 160, .5) 75%, transparent 100%); background-size: 100% 220%; }
+.game--dusk .game__dusk { animation: game-dusk 1.5s ease-in-out both; }
+.game--dawn .game__dusk { animation: game-dusk 1.5s ease-in-out both; background-image: linear-gradient(180deg, rgba(255, 210, 120, .9) 0%, rgba(255, 170, 110, .6) 40%, rgba(255, 240, 200, .3) 75%, transparent 100%); }
+@keyframes game-dusk { 0% { opacity: 0; background-position: 0 100%; } 40% { opacity: 1; } 100% { opacity: 0; background-position: 0 0; } }
+.game--night .game__mode-sun { display: block; }
+.game__res { display: flex; align-items: center; gap: 8px; }
+.game__gold, .game__guest {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 12px 0 5px; border-radius: 999px; font-weight: 800; font-size: 14px;
+  background: rgba(14, 9, 30, .6); border: 1px solid rgba(242, 181, 74, .45); color: #ffe7b8;
+}
+.game__coin { width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff2b0, #f2b54a 55%, #b8801e); box-shadow: inset 0 0 0 2px rgba(130, 80, 10, .35); }
+.game__guest { padding: 0 12px; border-color: rgba(255, 255, 255, .25); color: var(--muted); font-weight: 700; }
+.game__guest svg { width: 16px; height: 16px; }
+
+/* შეტყობინება („მალე“ და სხვ.) — მენიუს ზემოთ */
+.game__toast {
+  position: absolute; z-index: 2; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  max-width: min(92vw, 520px); width: max-content; padding: 9px 16px; border-radius: 14px; text-align: center; font-size: 14px; font-weight: 600;
+  background: rgba(20, 12, 40, .85); border: 1px solid rgba(242, 181, 74, .5); box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+}
+.game__toast { opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; transform: translate(-50%, 8px); z-index: 3; }
+.game__toast.is-on { opacity: 1; transform: translateX(-50%); }
+
+/* ტელეფონზე (ვერტიკალური ეკრანი, game.js — .game--tall) ქვედა მენიუ არ არის — ავტორის გადაწყვეტილება */
+.game--tall .game__nav { display: none; }
+.game--tall .game__toast { bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
+
+/* ქვედა მენიუ */
+.game__nav {
+  position: absolute; z-index: 2; left: 50%; bottom: max(10px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  display: grid; grid-template-columns: repeat(4, 1fr); width: min(calc(100% - 20px), 520px); padding: 6px; gap: 4px; border-radius: 20px;
+  background: linear-gradient(180deg, rgba(34, 24, 66, .94), rgba(16, 11, 34, .94)); border: 1px solid rgba(242, 181, 74, .4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+}
+.game__tab {
+  display: grid; justify-items: center; gap: 2px; padding: 7px 4px; border: 0; border-radius: 14px; cursor: pointer; background: none;
+  font: 700 12px var(--font-sans); color: var(--muted); touch-action: manipulation; transition: background .15s, color .15s;
+}
+.game__tab svg { width: 24px; height: 24px; }
+.game__tab:hover { color: var(--ink); background: rgba(255, 255, 255, .06); }
+.game__tab.is-active { color: #3a1d05; background: linear-gradient(180deg, #fff0b8, #f2b54a); }
+
+@media (max-width: 560px) {
+  .game__bar { padding-left: 10px; padding-right: 10px; }
+  .game__guest span { display: none; }
+  .game__guest { padding: 0 10px; }
+  .game__toast { font-size: 13px; }
+}

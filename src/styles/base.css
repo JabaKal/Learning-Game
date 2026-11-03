@@ -5,9 +5,42 @@ html, body { height: 100%; overflow: hidden; }          /* მთავარი
 body { background: var(--night); color: var(--ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 main { position: relative; z-index: 1; }
 
-/* სანამ კომპონენტები ჩაიტვირთება, გვერდი ნაზად ჩნდება */
-body > :not(script) { transition: opacity .35s; }
-html:not(.is-ready) body > :not(script) { opacity: 0; }
+/* ჩატვირთვა: გვერდი დამალულია, სანამ ყველაფერი მზადაა — მერე ერთად, რბილად ჩნდება (ნაწილ-ნაწილ ხტუნვის გარეშე) */
+body > :not(script):not(.boot) { transition: opacity .5s ease; }
+html:not(.is-ready) body > :not(script):not(.boot) { opacity: 0; }
+
+/* ჩატვირთვის ეკრანი: ლოგო და ოქროს ზოლი */
+.boot {
+  position: fixed; inset: 0; z-index: 100; display: grid; place-content: center; justify-items: center; gap: 18px;
+  background: radial-gradient(ellipse at 50% 60%, #2a1f5c 0%, var(--night) 70%);
+  transition: opacity .45s ease, visibility 0s .45s;
+}
+.boot__logo { width: 192px; height: auto; animation: boot-glow 1.6s ease-in-out infinite alternate; }
+.boot__bar { position: relative; width: 140px; height: 3px; border-radius: 3px; overflow: hidden; background: rgba(255, 255, 255, .12); }
+.boot__bar::after {
+  content: ''; position: absolute; inset: 0; width: 40%; border-radius: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent); animation: boot-run 1.1s ease-in-out infinite;
+}
+html.is-ready .boot { opacity: 0; visibility: hidden; }
+@keyframes boot-glow { from { opacity: .6; filter: drop-shadow(0 0 0 rgba(242, 181, 74, 0)); } to { opacity: 1; filter: drop-shadow(0 0 14px rgba(242, 181, 74, .55)); } }
+@keyframes boot-run { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+
+/* მთავარი გვერდი. „დაიწყე“-ზე თამაში მარჯვნიდან შემოსრიალდება (core/screens.js, game.module.css), მთავარი კი ოდნავ
+   მარცხნივ გადაიწევს და ჩაბნელდება — სიღრმის შეგრძნებისთვის (როგორც ტელეფონის აპლიკაციებში).
+   ⚡ აქ არ უნდა იყოს წესი, რომელიც .landing-ის ყველა ელემენტს ეხება (.landing * და მისთ.) — ბრაუზერი ყველას სტილს თავიდან
+   გადაითვლის და გადასვლა ჭედავს. ანიმაციებს core/screens.js აჩერებს */
+/* will-change მუდმივად: შრე ჩატვირთვისას ერთხელ მზადდება — თორემ ბრაუზერი მას „დაიწყე“-ზე ამზადებდა და ტელეფონზე ~0.1 წმ ჭედავდა */
+.landing { position: fixed; inset: 0; z-index: 2; will-change: transform; }
+.landing::after { content: ''; position: fixed; inset: 0; z-index: 40; pointer-events: none; background: #05030c; opacity: 0; will-change: opacity; }
+html[data-switch="prep-out"] .landing { transform: translateX(-22%); }
+html[data-switch="prep-out"] .landing::after { opacity: .55; }
+html[data-switch="in"] .landing { animation: landing-away .55s cubic-bezier(.22, .9, .3, 1) both; }
+html[data-switch="in"] .landing::after { animation: landing-dim .55s ease-out both; }
+html[data-switch="out"] .landing { animation: landing-back .45s cubic-bezier(.55, .05, .75, .45) both; }
+html[data-switch="out"] .landing::after { animation: landing-dim .45s ease-in reverse both; }
+@keyframes landing-away { from { transform: none; } to { transform: translateX(-22%); } }
+@keyframes landing-back { from { transform: translateX(-22%); } to { transform: none; } }
+@keyframes landing-dim { from { opacity: 0; } to { opacity: .55; } }
 
 :focus-visible { outline: 2px solid var(--gold-text); outline-offset: 3px; border-radius: 6px; }
 

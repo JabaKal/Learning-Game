@@ -1,0 +1,54 @@
+<section class="game" data-i18n-attr="aria-label:game.title">
+  <!-- რუკა ერთ ეკრანზე: ქვედა ფენა — მიწა და ტყე სურათად (canvas), შემდეგ — შენობები (SVG), ზემოდან — ღამის შუქები (SVG, მხოლოდ ღამით);
+       სამივეს game.js ხატავს (kingdom-map.js). ღამით: ვარსკვლავები ცაზე (მთვარე ამოღებულია — ავტორის თხოვნა) -->
+  <div class="game__view">
+    <!-- ცა რუკის უკან (ტელეფონზე, მთების უკან): დღისით ცისფერი, ღამით მუქი მთვარით — მთები მთვარეს ნაწილობრივ ფარავს -->
+    <div class="game__skyback" aria-hidden="true"></div>
+    <canvas class="game__ground"></canvas>
+    <svg class="game__map" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"></svg>
+    <svg class="game__lights" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" aria-hidden="true"></svg>
+    <div class="game__sky" aria-hidden="true"></div>
+    <!-- დღე ↔ ღამე: გადასვლისას რუკაზე გადაივლის მზის ჩასვლის / ამოსვლის თბილი შუქი (game.js — .game--dusk / .game--dawn) -->
+    <div class="game__dusk" aria-hidden="true"></div>
+  </div>
+
+  <header class="game__bar">
+    <!-- დღე / ღამე: რუკა ბნელდება, ინთება ჩირაღდნები, ანათებს მთვარე (game.js) -->
+    <button type="button" class="game__mode" aria-pressed="false" data-i18n-attr="aria-label:game.night;title:game.night">
+      <svg class="game__mode-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5 A8.5 8.5 0 1 1 9.5 4 A7 7 0 0 0 20 14.5 Z" fill="currentColor"/></svg>
+      <svg class="game__mode-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.6" fill="currentColor"/><path d="M12 2.5 V5 M12 19 V21.5 M2.5 12 H5 M19 12 H21.5 M5.3 5.3 L7 7 M17 17 L18.7 18.7 M5.3 18.7 L7 17 M17 7 L18.7 5.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <div class="game__res">
+      <span class="game__gold" aria-live="polite"><i class="game__coin" aria-hidden="true"></i><b class="game__gold-n">0</b></span>
+      <span class="game__guest">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4.5 20.5 C5.5 16 8.5 14 12 14 C15.5 14 18.5 16 19.5 20.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span data-i18n="game.guest"></span>
+      </span>
+    </div>
+  </header>
+
+  <p class="game__toast" role="status" aria-live="polite"></p>
+
+
+  <nav class="game__nav">
+    <button type="button" class="game__tab is-active" data-tab="kingdom" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21 V10 H6 V13 H9 V8 H11 V5 L13 3 L15 5 V8 V8 H15 V13 H18 V10 H21 V21 Z M10 21 V17 A2 2 0 0 1 14 17 V21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      <span data-i18n="game.nav.kingdom"></span>
+    </button>
+    <button type="button" class="game__tab" data-tab="learn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5 C6 4 9 4 12 6 C15 4 18 4 21 5.5 V19 C18 17.5 15 17.5 12 19.5 C9 17.5 6 17.5 3 19 Z M12 6 V19.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      <span data-i18n="game.nav.learn"></span>
+    </button>
+    <button type="button" class="game__tab" data-tab="battle">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4 L14 14 M14 14 L12.5 17 M14 14 L17 12.5 M20 4 L10 14 M10 14 L11.5 17 M10 14 L7 12.5 M15.5 15.5 L19 19 M8.5 15.5 L5 19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span data-i18n="game.nav.battle"></span>
+    </button>
+    <button type="button" class="game__tab" data-tab="profile">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 20.5 C5.5 16 8.5 14 12 14 C15.5 14 18.5 16 19.5 20.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span data-i18n="game.nav.profile"></span>
+    </button>
+  </nav>
+</section>
+
+<!-- Live Server ჩასვამს თავის სკრიპტს ამ ტეგის წინ (main.js მას შლის); თავად ტეგი იგნორირდება -->
+</body>
