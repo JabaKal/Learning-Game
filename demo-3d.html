@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3D მაღაზია — საცდელი</title>
+<!-- საცდელი გვერდი (საიტს არ ეკუთვნის): ერთი შენობა კოდით აწყობილ 3D-ში (Three.js). ფაქტურები იხატება კოდითვე (canvas), სურათები არ იტვირთება. -->
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #a9d3f0; font-family: system-ui, sans-serif; }
+  canvas { display: block; touch-action: none; }
+  .ui { position: fixed; left: 16px; top: 16px; right: 16px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .ui h1 { margin: 0 8px 0 0; font-size: 16px; color: #fff; text-shadow: 0 1px 3px #000a; }
+  button { font: inherit; font-size: 14px; padding: 8px 14px; border-radius: 999px; border: 1px solid #d9b46a; background: #2a2340e6; color: #f4e6c4; cursor: pointer; }
+  .hint { position: fixed; left: 16px; right: 16px; bottom: 14px; text-align: center; color: #fff; font-size: 13px; text-shadow: 0 1px 3px #000c; }
+</style>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
+</head>
+<body>
+<div class="ui"><h1>საცდელი 3D — მაღაზია</h1><button id="night">☾ ღამე</button><button id="spin">⟳ ტრიალი: ჩართ.</button></div>
+<div class="hint">ატრიალე თაგვით ან თითით · მიუახლოვდი ბორბლით ან ორი თითით</div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ---------- სცენა ----------
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const DAY_SKY = new THREE.Color('#a9d3f0'), NIGHT_SKY = new THREE.Color('#0c1430');
+scene.background = DAY_SKY.clone();
+scene.fog = new THREE.Fog(DAY_SKY.clone(), 30, 95);
+
+const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, .1, 300);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(1, 3.4, 0);
+controls.enableDamping = true;
+controls.minDistance = 7; controls.maxDistance = 45;
+controls.maxPolarAngle = Math.PI * .47;
+controls.autoRotate = true; controls.autoRotateSpeed = .6;
+const frame = () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+};
+camera.position.set(14, 9, 17).multiplyScalar(innerWidth < innerHeight ? 1.6 : 1);
+addEventListener('resize', frame);
+
+// ---------- ფაქტურები (კოდით დახატული) ----------
+const rnd = (a, b) => a + Math.random() * (b - a);
+function canvasTex(w, h, draw, repeat = [1, 1]) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(...repeat);
+  t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  return t;
+}
+const withRepeat = (t, x, y) => { const c = t.clone(); c.repeat.set(x, y); c.needsUpdate = true; return c; };
+
+const plasterTex = canvasTex(256, 256, (g, w, h) => {
+  g.fillStyle = '#ebdfc3'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 40; i++) { g.fillStyle = `rgba(150,120,80,${rnd(.03, .07)})`; g.beginPath(); g.arc(rnd(0, w), rnd(0, h), rnd(10, 40), 0, 7); g.fill(); }
+  for (let i = 0; i < 2500; i++) { g.fillStyle = Math.random() < .5 ? 'rgba(255,255,255,.25)' : 'rgba(90,70,40,.12)'; g.fillRect(rnd(0, w), rnd(0, h), 1.5, 1.5); }
+});
+// სახურავის კრამიტი: რიგები ფერდობის გასწვრივ (ფაქტურის x), კრამიტები — მწვერვალის გასწვრივ (y)
+const roofTex = canvasTex(256, 256, (g, w, h) => {
+  g.fillStyle = '#4a1a10'; g.fillRect(0, 0, w, h);
+  const n = 8, rw = w / n, tw = h / 8;
+  for (let r = 0; r < n; r++) for (let k = -1; k < 9; k++) {
+    const x = r * rw, y = k * tw + (r % 2) * tw / 2, hue = rnd(8, 18), s = rnd(50, 66), l = rnd(36, 48);
+    const grd = g.createLinearGradient(0, y, 0, y + tw);
+    grd.addColorStop(0, `hsl(${hue},${s}%,${l - 12}%)`); grd.addColorStop(.45, `hsl(${hue},${s}%,${l + 5}%)`); grd.addColorStop(1, `hsl(${hue},${s}%,${l - 16}%)`);
+    g.fillStyle = grd; g.beginPath(); g.roundRect(x, y + 1, rw + 2, tw - 2, [0, tw / 2.4, tw / 2.4, 0]); g.fill();
+  }
+  for (let r = 0; r < n; r++) { g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(r * rw + rw - 3, 0, 3, h); }
+});
+const woodTex = canvasTex(256, 256, (g, w, h) => {
+  const n = 6, pw = w / n;
+  for (let i = 0; i < n; i++) {
+    g.fillStyle = `hsl(${rnd(24, 30)},${rnd(35, 45)}%,${rnd(28, 36)}%)`; g.fillRect(i * pw, 0, pw, h);
+    for (let k = 0; k < 14; k++) {
+      const x = i * pw + rnd(3, pw - 3);
+      g.strokeStyle = `rgba(30,15,5,${rnd(.1, .25)})`; g.lineWidth = rnd(.5, 1.5);
+      g.beginPath(); g.moveTo(x, 0); g.bezierCurveTo(x + rnd(-4, 4), h / 3, x + rnd(-4, 4), h * 2 / 3, x, h); g.stroke();
+    }
+    g.fillStyle = 'rgba(20,10,5,.6)'; g.fillRect(i * pw, 0, 2, h);
+  }
+});
+const stoneTex = canvasTex(256, 256, (g, w, h) => {
+  g.fillStyle = '#4f4a43'; g.fillRect(0, 0, w, h);
+  const rows = 6, rh = h / rows;
+  for (let r = 0; r < rows; r++) {
+    let x = -rnd(0, 30);
+    while (x < w) {
+      const sw = rnd(30, 60);
+      g.fillStyle = `hsl(${rnd(30, 45)},${rnd(5, 12)}%,${rnd(48, 66)}%)`; g.beginPath(); g.roundRect(x + 2, r * rh + 2, sw - 4, rh - 4, 6); g.fill();
+      g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(x + 5, r * rh + 4, sw - 10, 3);
+      x += sw;
+    }
+  }
+}, [4, 1]);
+const cobbleTex = canvasTex(256, 256, (g, w, h) => {
+  g.fillStyle = '#6b6458'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 230; i++) { const r = rnd(8, 15); g.fillStyle = `hsl(${rnd(30, 45)},${rnd(4, 12)}%,${rnd(50, 70)}%)`; g.beginPath(); g.ellipse(rnd(0, w), rnd(0, h), r, r * rnd(.7, 1), rnd(0, 3), 0, 7); g.fill(); }
+}, [1, 7]);
+const grassTex = canvasTex(256, 256, (g, w, h) => {
+  g.fillStyle = '#5f8f3a'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 60; i++) { g.fillStyle = `rgba(${rnd(60, 110)},${rnd(120, 160)},${rnd(40, 70)},.25)`; g.beginPath(); g.arc(rnd(0, w), rnd(0, h), rnd(10, 40), 0, 7); g.fill(); }
+  for (let i = 0; i < 3000; i++) { g.fillStyle = Math.random() < .5 ? 'rgba(40,70,20,.5)' : 'rgba(150,190,90,.5)'; g.fillRect(rnd(0, w), rnd(0, h), 1, rnd(2, 4)); }
+}, [12, 12]);
+const awningTex = canvasTex(128, 32, (g, w, h) => { for (let i = 0; i < 8; i++) { g.fillStyle = i % 2 ? '#f1e6cf' : '#b8322a'; g.fillRect(i * w / 8, 0, w / 8, h); } });
+const signTex = canvasTex(256, 192, (g, w, h) => {
+  g.fillStyle = '#5a3a20'; g.fillRect(0, 0, w, h);
+  g.strokeStyle = '#d9b46a'; g.lineWidth = 10; g.strokeRect(8, 8, w - 16, h - 16);
+  const cx = w / 2, cy = h / 2, grd = g.createRadialGradient(cx - 15, cy - 15, 5, cx, cy, 60);
+  grd.addColorStop(0, '#ffe58a'); grd.addColorStop(1, '#c8901e');
+  g.fillStyle = grd; g.beginPath(); g.arc(cx, cy, 58, 0, 7); g.fill();
+  g.strokeStyle = '#8a5a10'; g.lineWidth = 5; g.beginPath(); g.arc(cx, cy, 46, 0, 7); g.stroke();
+  g.fillStyle = '#7a4a08'; g.font = 'bold 64px serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('₾', cx, cy + 4);
+});
+const puffTex = canvasTex(64, 64, (g) => {
+  const grd = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  grd.addColorStop(0, 'rgba(255,255,255,.9)'); grd.addColorStop(.5, 'rgba(255,255,255,.4)'); grd.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = grd; g.fillRect(0, 0, 64, 64);
+});
+
+// ---------- მასალები ----------
+const M = o => new THREE.MeshStandardMaterial({ roughness: .9, ...o });
+const plasterMat = M({ map: plasterTex });
+const atticMat = M({ map: withRepeat(plasterTex, .2, .2) });
+const beamMat = M({ color: '#3b2416', roughness: .8 });
+const woodMat = M({ map: woodTex });
+const doorMat = M({ map: woodTex, color: '#b08a6a' });
+const stoneMat = M({ map: stoneTex });
+const glassMat = new THREE.MeshStandardMaterial({ color: '#2c3a4c', roughness: .25, metalness: .2, emissive: '#ffb14e', emissiveIntensity: .05 });
+const lanternMat = new THREE.MeshStandardMaterial({ color: '#ffe2a0', emissive: '#ffb050', emissiveIntensity: .3 });
+const ironMat = M({ color: '#2a2a2e', roughness: .6, metalness: .6 });
+const goldMat = M({ color: '#d9a640', roughness: .4, metalness: .7 });
+const leafMat = M({ color: '#3f7a2e' });
+const BOX = new THREE.BoxGeometry(1, 1, 1);
+const SPHERE = new THREE.SphereGeometry(1, 12, 9);
+const flowerMats = ['#d6304a', '#f2c94c', '#e86fa8', '#ffffff'].map(c => M({ color: c, roughness: .7 }));
+
+const house = new THREE.Group(); scene.add(house);
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+const UP = V(0, 1, 0), X = V(1, 0, 0), NX = V(-1, 0, 0), Z = V(0, 0, 1), NZ = V(0, 0, -1);
+function add(geo, mat, x, y, z, sx = 1, sy = 1, sz = 1) {
+  const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.scale.set(sx, sy, sz); house.add(m); return m;
+}
+
+// კედლის „სახე“: a — კედლის გასწვრივ, b — ზემოთ, off — კედლიდან გარეთ
+function makeFace(origin, u, n, w, h) {
+  const q = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(u, UP, n));
+  return { u, n, w, h, q, P: (a, b, off = 0) => origin.clone().addScaledVector(u, a).addScaledVector(UP, b).addScaledVector(n, off) };
+}
+function boxFaces(w, d, y0, h) {
+  return {
+    front: makeFace(V(-w / 2, y0, d / 2), X, Z, w, h),
+    back: makeFace(V(w / 2, y0, -d / 2), NX, NZ, w, h),
+    right: makeFace(V(w / 2, y0, d / 2), NZ, X, d, h),
+    left: makeFace(V(-w / 2, y0, -d / 2), Z, NX, d, h)
+  };
+}
+function place(m, f, a, b, off) { m.position.copy(f.P(a, b, off)); m.quaternion.copy(f.q); house.add(m); return m; }
+function panel(f, a, b, w, h, d, mat) { const m = new THREE.Mesh(BOX, mat); m.scale.set(w, h, d); return place(m, f, a, b, d / 2); }
+function beam(f, a1, b1, a2, b2, t = .16, d = .1, mat = beamMat) {
+  const len = Math.hypot(a2 - a1, b2 - b1), m = new THREE.Mesh(BOX, mat);
+  m.scale.set(len + t, t, d);
+  place(m, f, (a1 + a2) / 2, (b1 + b2) / 2, d / 2);
+  m.rotateZ(Math.atan2(b2 - b1, a2 - a1));
+  return m;
+}
+function flowerBox(f, ca, b, w) {
+  panel(f, ca, b, w + .1, .2, .26, woodMat);
+  panel(f, ca, b + .12, w, .1, .22, leafMat);
+  for (let i = 0; i < 9; i++) {
+    const s = new THREE.Mesh(SPHERE, flowerMats[i % 4]); s.scale.setScalar(rnd(.06, .08));
+    place(s, f, ca - w / 2 + .06 + i * (w - .12) / 8, b + .18 + rnd(0, .05), .13 + rnd(-.05, .05));
+  }
+}
+// ფანჯარა: a, b — ქვედა მარცხენა კუთხე; cols — რამდენ ნაწილად იყოფა
+function windowAt(f, a, b, w, h, { cols = 2, flowers = false } = {}) {
+  place(new THREE.Mesh(new THREE.PlaneGeometry(w, h), glassMat), f, a + w / 2, b + h / 2, .015);
+  const t = .1, d = .14;
+  beam(f, a, b, a + w, b, t, d); beam(f, a, b + h, a + w, b + h, t, d);
+  beam(f, a, b, a, b + h, t, d); beam(f, a + w, b, a + w, b + h, t, d);
+  for (let i = 1; i < cols; i++) beam(f, a + w * i / cols, b, a + w * i / cols, b + h, .05, .08);
+  beam(f, a, b + h * .55, a + w, b + h * .55, .05, .08);
+  panel(f, a + w / 2, b - .06, w + .3, .07, .22, woodMat);
+  if (flowers) flowerBox(f, a + w / 2, b - .2, w);
+}
+
+// ---------- სახლი ----------
+const W = 5, D = 6, H1 = 2.6, W2 = 5.3, D2 = 6.4, H2 = 2.3, RH = 2.7;
+const Y1 = .5, Y2 = Y1 + H1, Y3 = Y2 + H2;
+add(BOX, stoneMat, 0, .25, 0, W + .4, .5, D + .4);              // ქვის საძირკველი
+add(BOX, plasterMat, 0, Y1 + H1 / 2, 0, W, H1, D);              // პირველი სართული
+add(BOX, beamMat, 0, Y2, 0, W2 + .1, .24, D2 + .1);              // სართულშორისი კოჭი
+add(BOX, plasterMat, 0, Y2 + H2 / 2, 0, W2, H2, D2);             // მეორე სართული (ოდნავ გადმოწეული)
+for (let x = -W / 2 + .3; x < W / 2; x += .45) {                 // კოჭების ბოლოები გადმოწეული სართულის ქვეშ
+  add(BOX, beamMat, x, Y2 - .17, D / 2 + .12, .12, .14, .26);
+  add(BOX, beamMat, x, Y2 - .17, -D / 2 - .12, .12, .14, .26);
+}
+// სხვენი — სამკუთხა პრიზმა
+const tri = new THREE.Shape([new THREE.Vector2(-W2 / 2, 0), new THREE.Vector2(W2 / 2, 0), new THREE.Vector2(0, RH)]);
+const atticGeo = new THREE.ExtrudeGeometry(tri, { depth: D2, bevelEnabled: false }); atticGeo.translate(0, 0, -D2 / 2);
+add(atticGeo, atticMat, 0, Y3, 0);
+
+// ორფერდა სახურავი
+function gableRoof(w, yBase, h, depth, ov, x0 = 0, z0 = 0) {
+  const a = Math.atan2(h, w / 2), T = .2, Ls = (w / 2 + ov) / Math.cos(a) + .1, yR = yBase + h;
+  const tex = withRepeat(roofTex, Ls / 2.2, depth / 2.2), mat = M({ map: tex });
+  for (const s of [1, -1]) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(Ls, T, depth), mat);
+    const d = V(s * Math.cos(a), -Math.sin(a), 0), nr = V(s * Math.sin(a), Math.cos(a), 0);
+    m.position.set(x0, yR, z0).addScaledVector(d, Ls / 2 - .1).addScaledVector(nr, T / 2);
+    m.rotation.set(0, s > 0 ? 0 : Math.PI, -a);
+    house.add(m);
+  }
+  const ridge = add(new THREE.CylinderGeometry(.17, .17, depth + .1, 10), M({ color: '#6a2a18' }), x0, yR + .2, z0);
+  ridge.rotation.x = Math.PI / 2;
+}
+gableRoof(W2, Y3, RH, D2 + 1, .5);
+
+// საკვამური + კვამლი
+const chim = add(BOX, M({ map: withRepeat(stoneTex, 1, 5) }), 1.3, 7.4, -1.6, .75, 3.6, .75);
+add(BOX, stoneMat, 1.3, 9.25, -1.6, .95, .16, .95);
+const SMOKE_AT = V(1.3, 9.4, -1.6);
+
+// --- პირველი სართული ---
+const F1 = boxFaces(W, D, Y1, H1);
+for (const f of Object.values(F1)) { beam(f, 0, .08, f.w, .08); beam(f, 0, f.h - .08, f.w, f.h - .08); beam(f, 0, 0, 0, f.h); beam(f, f.w, 0, f.w, f.h); }
+// წინა: კარი, ვიტრინა, ფარანი, აბრა
+{
+  const f = F1.front;
+  beam(f, 1.95, 0, 1.95, f.h);
+  panel(f, 1, 1.03, 1, 2.05, .08, doorMat);                                          // კარი
+  beam(f, .5, 0, .5, 2.1, .12, .14); beam(f, 1.5, 0, 1.5, 2.1, .12, .14); beam(f, .5, 2.1, 1.5, 2.1, .14, .16);
+  const knob = new THREE.Mesh(SPHERE, goldMat); knob.scale.setScalar(.06); place(knob, f, 1.3, 1.05, .14);
+  panel(f, 1, -.38, 1.5, .25, .55, stoneMat);                                        // ქვის საფეხური
+  windowAt(f, 2.35, .7, 2.2, 1.35, { cols: 3 });                                      // ვიტრინა
+  // ტილოს ფარდული ვიტრინის თავზე
+  const aw = new THREE.Mesh(BOX, M({ map: awningTex })); aw.scale.set(2.7, .05, 1.1);
+  const awG = new THREE.Group(); place(awG, f, 3.45, 2.32, 0); awG.add(aw);
+  aw.position.set(0, -.2, .5); aw.rotation.x = .45;
+  // ფარანი კართან
+  const lantern = new THREE.Mesh(BOX, lanternMat); lantern.scale.set(.2, .3, .2); place(lantern, f, 1.75, 2.0, .38);
+  const cap = new THREE.Mesh(new THREE.ConeGeometry(.17, .18, 4), ironMat); place(cap, f, 1.75, 2.24, .38); cap.rotateY(Math.PI / 4);
+  beam(f, 1.75, 2.3, 1.75, 2.3, .04, .38, ironMat);
+  var LANTERN_AT = f.P(1.75, 2.0, .7);
+}
+// მოკიდებული აბრა (ირხევა)
+const armZ = D / 2 - .15;
+add(BOX, ironMat, -W / 2 - .55, Y1 + 2.35, armZ, 1.1, .07, .07);
+const signPivot = new THREE.Group(); signPivot.position.set(-W / 2 - .65, Y1 + 2.33, armZ); house.add(signPivot);
+const board = new THREE.Mesh(BOX, [woodMat, woodMat, woodMat, woodMat, M({ map: signTex }), M({ map: signTex })]);
+board.scale.set(.9, .68, .06); board.position.y = -.5; signPivot.add(board);
+for (const dx of [-.35, .35]) { const ch = new THREE.Mesh(BOX, ironMat); ch.scale.set(.025, .17, .025); ch.position.set(dx, -.08, 0); signPivot.add(ch); }
+// გვერდები და უკანა
+{
+  const f = F1.left; for (const a of [2, 4]) beam(f, a, 0, a, f.h);
+  for (const a of [.6, 2.6, 4.6]) windowAt(f, a, .9, .8, 1);
+}
+{
+  const f = F1.right; for (const a of [2, 4]) beam(f, a, 0, a, f.h);
+  windowAt(f, .6, .9, .8, 1);
+}
+{
+  const f = F1.back; beam(f, 2.5, 0, 2.5, f.h);
+  windowAt(f, .85, .9, .8, 1); windowAt(f, 3.35, .9, .8, 1);
+}
+
+// --- მეორე სართული: შუა ორ მონაკვეთში ფანჯრები, კიდეებზე X-კოჭები ---
+const F2 = boxFaces(W2, D2, Y2 + .12, H2 - .12);
+for (const [k, f] of Object.entries(F2)) {
+  const bw = f.w / 4;
+  beam(f, 0, .08, f.w, .08); beam(f, 0, f.h - .08, f.w, f.h - .08);
+  for (let i = 0; i <= 4; i++) beam(f, i * bw, 0, i * bw, f.h);
+  for (const i of [0, 3]) { beam(f, i * bw, 0, (i + 1) * bw, f.h, .13); beam(f, i * bw, f.h, (i + 1) * bw, 0, .13); }
+  for (const i of [1, 2]) windowAt(f, i * bw + bw / 2 - .4, .65, .8, 1.05, { flowers: k === 'front' || k === 'right' });
+}
+
+// --- ფრონტონები (სამკუთხა კედლები) ---
+for (const f of [makeFace(V(-W2 / 2, Y3, D2 / 2), X, Z, W2, RH), makeFace(V(W2 / 2, Y3, -D2 / 2), NX, NZ, W2, RH)]) {
+  const w = f.w, h = f.h, cb = 1.2, x1 = (w / 2) * (cb / h);
+  beam(f, 0, .08, w, .08);
+  beam(f, 0, 0, w / 2, h); beam(f, w, 0, w / 2, h);
+  beam(f, x1, cb, w - x1, cb);
+  beam(f, w / 2, cb, w / 2, h);
+  beam(f, w * .18, .08, w * .36, cb, .13); beam(f, w * .82, .08, w * .64, cb, .13);
+  windowAt(f, w / 2 - .33, .25, .66, .72);
+}
+
+// ---------- ვაჭრობის ფარდული (მარჯვნივ) ----------
+const sx0 = W / 2, sx1 = W / 2 + 2.5, sz0 = -2.6, sz1 = 1.1, szc = (sz0 + sz1) / 2;
+for (const z of [sz0 + .1, szc, sz1 - .1]) add(BOX, woodMat, sx1 - .1, 1.3, z, .16, 2.6, .16);
+add(BOX, beamMat, sx1 - .1, 2.6, szc, .2, .2, sz1 - sz0);
+{
+  const top = 3.3, bot = 2.45, run = sx1 + .35 - sx0, a = Math.atan2(top - bot, run), T = .16, Ls = run / Math.cos(a), depth = sz1 - sz0 + .5;
+  const m = new THREE.Mesh(new THREE.BoxGeometry(Ls, T, depth), M({ map: withRepeat(roofTex, Ls / 2.2, depth / 2.2) }));
+  m.position.set(sx0, top, szc).addScaledVector(V(Math.cos(a), -Math.sin(a), 0), Ls / 2).addScaledVector(V(Math.sin(a), Math.cos(a), 0), T / 2);
+  m.rotation.z = -a; house.add(m);
+}
+add(BOX, woodMat, sx1 - .65, .48, szc, .75, .95, 3.1);                             // დახლი
+const fruitMats = { apple: M({ color: '#c0262d', roughness: .5 }), orange: M({ color: '#e8892a', roughness: .6 }), cabbage: M({ color: '#7fb14a' }) };
+[['apple', -1.75], ['orange', -.75], ['cabbage', .25]].forEach(([kind, z]) => {
+  add(BOX, woodMat, sx1 - .65, 1.1, z, .6, .3, .8);
+  for (let i = 0; i < 10; i++) {
+    const r = kind === 'cabbage' ? .13 : .09, s = add(SPHERE, fruitMats[kind], sx1 - .65 + rnd(-.2, .2), 1.3 + rnd(0, .06), z + rnd(-.3, .3));
+    s.scale.setScalar(r);
+  }
+});
+// კასრები და ტომრები
+const barrelGeo = new THREE.CylinderGeometry(.3, .3, .85, 14), ringGeo = new THREE.CylinderGeometry(.315, .315, .06, 14);
+for (const [x, z] of [[sx1 + .55, 1.7], [sx1 + 1.2, 1.3], [sx1 + .6, 2.4], [-W / 2 - .6, 3.7]]) {
+  add(barrelGeo, M({ map: woodTex, color: '#c9a07a' }), x, .425, z);
+  for (const y of [.18, .67]) add(ringGeo, ironMat, x, y, z);
+}
+const sackMat = M({ color: '#b89a6a' });
+for (const [x, z] of [[sx1 + .45, -3.1], [sx1 + 1.05, -3.0], [sx1 + .75, -3.6]]) add(SPHERE, sackMat, x, .33, z, .35, .4, .33);
+add(BOX, woodMat, -W / 2 - .7, .3, 4.5, .6, .6, .6);
+add(BOX, woodMat, -W / 2 - .5, .85, 4.4, .45, .45, .45).rotation.y = .4;
+
+house.traverse(o => { if (o.isMesh && o.material !== glassMat) { o.castShadow = true; o.receiveShadow = true; } });
+
+// ---------- მიწა, გზა, ხეები ----------
+const ground = new THREE.Mesh(new THREE.CircleGeometry(160, 64), M({ map: withRepeat(grassTex, 100, 100), color: '#c4d0a4' }));
+ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+const path = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 14), M({ map: cobbleTex }));
+path.rotation.x = -Math.PI / 2; path.position.set(-1.5, .015, D / 2 + 7.2); path.receiveShadow = true; scene.add(path);
+
+const trunkMat = M({ color: '#5a3d24' }), pineMats = ['#2f5d2a', '#3a6b2f', '#28532a'].map(c => M({ color: c, flatShading: true }));
+const CONE = new THREE.ConeGeometry(1, 1, 7), TRUNK = new THREE.CylinderGeometry(.12, .2, 1, 6);
+function pine(x, z, s) {
+  const g = new THREE.Group(), mat = pineMats[Math.floor(rnd(0, 3))];
+  const tr = new THREE.Mesh(TRUNK, trunkMat); tr.position.y = .5; g.add(tr);
+  for (let i = 0; i < 3; i++) {
+    const c = new THREE.Mesh(CONE, mat), r = 1.1 - i * .28, hh = 1.5 - i * .2;
+    c.scale.set(r, hh, r); c.position.y = .9 + i * .75 + hh / 2; c.rotation.y = rnd(0, 3); g.add(c);
+  }
+  g.position.set(x, 0, z); g.scale.setScalar(s);
+  g.traverse(o => { if (o.isMesh) o.castShadow = o.receiveShadow = true; });
+  scene.add(g);
+}
+// ხეები: რკალი კამერის ორბიტის მიღმა (ხედს არ ფარავს) + რამდენიმე პატარა სახლთან
+for (let i = 0; i < 70; i++) {
+  const ang = rnd(0, Math.PI * 2), r = rnd(25, 48);
+  pine(Math.cos(ang) * r + 1, Math.sin(ang) * r, rnd(1.1, 2));
+}
+for (const [x, z] of [[-6, -4], [-7, -1.5], [5.5, -6], [8.5, -3], [-5, -7], [9, 2.5]]) pine(x, z, rnd(.75, 1));
+const rockMat = M({ color: '#8a8478', flatShading: true }), ROCK = new THREE.DodecahedronGeometry(1, 0);
+for (let i = 0; i < 12; i++) {
+  const ang = rnd(0, Math.PI * 2), r = rnd(6, 14), m = new THREE.Mesh(ROCK, rockMat);
+  m.position.set(Math.cos(ang) * r, .1, Math.sin(ang) * r); m.scale.set(rnd(.2, .5), rnd(.15, .35), rnd(.2, .5)); m.rotation.y = rnd(0, 3);
+  m.castShadow = m.receiveShadow = true; scene.add(m);
+}
+
+// ---------- სინათლე ----------
+const hemi = new THREE.HemisphereLight('#cfe6ff', '#6b5a3a', 1.1); scene.add(hemi);
+const sun = new THREE.DirectionalLight('#fff3dc', 2.8);
+sun.position.set(12, 18, 9); sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 60 });
+sun.shadow.bias = -.0005; sun.shadow.normalBias = .02;
+scene.add(sun);
+const lanternLight = new THREE.PointLight('#ffb050', 0, 10, 2); lanternLight.position.copy(LANTERN_AT); scene.add(lanternLight);
+const roomLight = new THREE.PointLight('#ffb050', 0, 7, 2); roomLight.position.set(0, 2, D / 2 + .8); scene.add(roomLight);
+
+// ვარსკვლავები (ღამით)
+const starPos = [];
+for (let i = 0; i < 500; i++) { const t = rnd(0, Math.PI * 2), p = rnd(.08, 1.3); starPos.push(Math.cos(t) * Math.cos(p) * 120, Math.sin(p) * 120, Math.sin(t) * Math.cos(p) * 120); }
+const starGeo = new THREE.BufferGeometry(); starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
+const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: '#fff', size: .7, transparent: true, opacity: 0, fog: false }));
+scene.add(stars);
+
+// კვამლი
+const puffs = Array.from({ length: 16 }, (_, i) => {
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: puffTex, transparent: true, depthWrite: false, color: '#e8e8e8' }));
+  s.userData.phase = i / 16; scene.add(s); return s;
+});
+
+// ---------- დღე / ღამე ----------
+let night = 0, nightTarget = 0;
+const C = c => new THREE.Color(c), lerpC = (a, b, k) => a.clone().lerp(b, k);
+const SUN_D = C('#fff3dc'), SUN_N = C('#8fa8ff'), HS_D = C('#cfe6ff'), HS_N = C('#2b3a66'), HG_D = C('#6b5a3a'), HG_N = C('#0b0d14');
+const SM_D = C('#e8e8e8'), SM_N = C('#5a6070');
+function applyNight(k) {
+  scene.background.copy(lerpC(DAY_SKY, NIGHT_SKY, k)); scene.fog.color.copy(scene.background);
+  sun.intensity = THREE.MathUtils.lerp(2.8, .45, k); sun.color.copy(lerpC(SUN_D, SUN_N, k));
+  hemi.intensity = THREE.MathUtils.lerp(1.1, .3, k); hemi.color.copy(lerpC(HS_D, HS_N, k)); hemi.groundColor.copy(lerpC(HG_D, HG_N, k));
+  glassMat.emissiveIntensity = THREE.MathUtils.lerp(.05, 2.4, k);
+  lanternMat.emissiveIntensity = THREE.MathUtils.lerp(.3, 4, k);
+  lanternLight.intensity = 14 * k; roomLight.intensity = 10 * k;
+  stars.material.opacity = k;
+  for (const p of puffs) p.material.color.copy(lerpC(SM_D, SM_N, k));
+}
+const nightBtn = document.getElementById('night'), spinBtn = document.getElementById('spin');
+nightBtn.onclick = () => { nightTarget = nightTarget ? 0 : 1; nightBtn.textContent = nightTarget ? '☀ დღე' : '☾ ღამე'; };
+const setSpin = on => { controls.autoRotate = on; spinBtn.textContent = `⟳ ტრიალი: ${on ? 'ჩართ.' : 'გამორთ.'}`; };
+spinBtn.onclick = () => setSpin(!controls.autoRotate);
+controls.addEventListener('start', () => setSpin(false));
+
+// ---------- ციკლი ----------
+const clock = new THREE.Clock();
+renderer.setAnimationLoop(() => {
+  const t = clock.getElapsedTime();
+  if (night !== nightTarget) { night += Math.sign(nightTarget - night) * .02; night = Math.min(1, Math.max(0, night)); applyNight(night); }
+  for (const p of puffs) {
+    const k = (t * .18 + p.userData.phase) % 1;
+    p.position.set(SMOKE_AT.x + k * 1.6 + Math.sin(t + p.userData.phase * 9) * .15, SMOKE_AT.y + k * 4.5, SMOKE_AT.z - k * .6);
+    p.scale.setScalar(.5 + k * 2.4);
+    p.material.opacity = (k < .12 ? k / .12 : 1) * (1 - k) * .55;
+  }
+  signPivot.rotation.x = Math.sin(t * 1.3) * .07;
+  controls.update();
+  renderer.render(scene, camera);
+});
+// #night — გვერდი ღამით იხსნება
+if (location.hash === '#night') { night = nightTarget = 1; nightBtn.textContent = '☀ დღე'; }
+applyNight(night);
+</script>
+</body>
+</html>

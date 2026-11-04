@@ -143,8 +143,8 @@ html[data-screen="game"]:not([data-switch]) .game__fx .flag { animation: game-wa
 .game__art-back img { position: absolute; display: block; max-width: none; user-select: none; -webkit-user-drag: none; }
 .game--art .game__art-back { display: block; }
 .game--night .game__art-back { filter: blur(6px) brightness(.36) saturate(.65) hue-rotate(15deg); }
-/* სურათის კიდეები რბილად ქრება ბუნდოვან ფონში (იგივე სურათია) — მკვეთრი ხაზი არ ჩანს */
-.game__art-img {
+/* contain: სურათის კიდეები რბილად ქრება ბუნდოვან ფონში (იგივე სურათია) — მკვეთრი ხაზი არ ჩანს. cover-ზე კიდეები სუფთაა */
+.game__art--contain .game__art-img {
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent), linear-gradient(transparent, #000 5%, #000 95%, transparent);
   -webkit-mask-composite: source-in;
   mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent), linear-gradient(transparent, #000 5%, #000 95%, transparent);

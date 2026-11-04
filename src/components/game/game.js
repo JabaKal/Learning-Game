@@ -54,7 +54,8 @@ export function init(root) {
     }
     // contain — მთელი სურათი ეკრანზე ეტევა (არაფერი იჭრება), ცარიელ ზოლებს ავსებს იგივე სურათის ბუნდოვანი ასლი (.game__art-back);
     // cover — სურათი ფარავს ეკრანს, ეკრანის ფორმის მიხედვით კიდეები იჭრება
-    const k = (A.fit === 'contain' ? Math.min : Math.max)(w / A.w, h / A.h), bw = A.w * k, bh = A.h * k;
+    // ზომა და მდებარეობა — მთელ პიქსელებზე (წილადზე სურათი ოდნავ ბუნდოვანდება)
+    const k = (A.fit === 'contain' ? Math.min : Math.max)(w / A.w, h / A.h), bw = Math.ceil(A.w * k), bh = Math.ceil(A.h * k);
     // ბუნდოვანი ფონი — იგივე ფაილი, რაც ბრაუზერმა სურათისთვის აირჩია (მეორე ჩამოტვირთვა არ ხდება)
     // ცარიელი ზოლები: სურათის სარკისებრი ანარეკლი ყოველ მხარეს (+ ასლი სურათის ქვეშ — მის რბილ კიდეს ქვემოდან ავსებს) (როგორც წყალში) — ნაკერთან ფერები ზუსტად ემთხვევა, ხაზი არ ჩანს.
     // იგივე ფაილი, რაც ბრაუზერმა სურათისთვის აირჩია (მეორე ჩამოტვირთვა არ ხდება)
@@ -70,7 +71,8 @@ export function init(root) {
       back.innerHTML = tiles;
     };
     if (day && !day.complete) day.addEventListener('load', useBack, { once: true }); else useBack();
-    art.style.cssText = `width:${bw.toFixed(1)}px;height:${bh.toFixed(1)}px;left:${((w - bw) * A.ax).toFixed(1)}px;top:${((h - bh) * A.ay).toFixed(1)}px`;
+    art.classList.toggle('game__art--contain', A.fit === 'contain');
+    art.style.cssText = `width:${bw}px;height:${bh}px;left:${Math.round(x0)}px;top:${Math.round(y0)}px`;
     art.querySelector('.game__art-day')?.setAttribute('sizes', `${Math.ceil(bw)}px`);   // ბრაუზერი ირჩევს srcset-იდან საკმარისად დიდ, მაგრამ არა ზედმეტ ზომას
     keepLabelsIn();
   };
